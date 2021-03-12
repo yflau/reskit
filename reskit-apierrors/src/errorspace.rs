@@ -1,5 +1,11 @@
+use std::fmt::{Display, Result, Formatter};
 use std::collections::HashMap;
+use std::error::{Error};
 
+use anyhow;
+use http_types::{StatusCode};
+
+use crate::{PVLost};
 use crate::{APIErrorMeta, APIErrorClass, BUILTIN_APP_NAME, BUILTIN_API_ERROR_CLASSES};
 
 #[derive(Debug)]
@@ -27,6 +33,63 @@ impl<'a> Errorspace<'a> {
             Some(app) => app.get(code).copied(),
             None => None,
         }
+    }
+
+    pub fn adapt(&self, err: anyhow::Error, default_class: &'a APIErrorClass, mapping_names: &[&str])
+        -> impl 'a+Error + APIErrorMeta 
+    {
+        self._adapt(3, err, default_class, mapping_names)
+    }
+
+    fn _adapt(&self, _skip: usize, err: anyhow::Error, default_class: &'a APIErrorClass, _mapping_names: &[&str]) // FIXME: why need static?
+        -> impl 'a+Error+APIErrorMeta
+    {
+        WithDetail {
+            error: err,
+            meta: default_class, // &*ERR_UNKNOWN,
+            caller: None,
+        }
+    }
+}
+
+#[derive(Debug)]
+struct WithDetail<'a> {
+    meta: &'a APIErrorClass,
+    error: anyhow::Error,
+    caller: Option<String>,
+}
+
+impl<'a> Display for WithDetail<'a> {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        self.meta.fmt(f) // TODO
+    }
+}
+
+impl<'a> Error for WithDetail<'a> {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        self.error.source()
+    }
+}
+
+impl<'a> APIErrorMeta for WithDetail<'a> {
+    fn system(&self) -> &str {
+        &self.meta.system()
+    }
+
+    fn code(&self) -> &str {
+        &self.meta.code()
+    }
+
+    fn message(&self) -> &str {
+        &self.meta.message()
+    }
+
+    fn status_code(&self) -> StatusCode {
+        self.meta.status_code()
+    }
+
+    fn pvlost(&self) -> PVLost {
+        self.meta.pvlost()
     }
 }
 
