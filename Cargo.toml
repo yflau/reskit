@@ -11,6 +11,18 @@ edition = "2018"
 [workspace]
 members = [
   ".",
-  "reskit-apierrors",
   "reskit-utils",
+  "reskit-apierrors",
+  "reskit-registry",
+  "reskit-renderer",
+  "reskit-log",
+  "reskit-doc",
+  "reskit-jose",
+  "reskit-sql",
+  "reskit-cache",
+  "reskit-event",
+  "reskit-client",
+  "reskit-server",
+  "reskit-workflow",
+  "reskit-graphql",
 ]

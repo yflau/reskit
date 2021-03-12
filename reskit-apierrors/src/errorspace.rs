@@ -41,7 +41,7 @@ impl<'a> Errorspace<'a> {
         self._adapt(3, err, default_class, mapping_names)
     }
 
-    fn _adapt(&self, _skip: usize, err: anyhow::Error, default_class: &'a APIErrorClass, _mapping_names: &[&str]) // FIXME: why need static?
+    fn _adapt(&self, _skip: usize, err: anyhow::Error, default_class: &'a APIErrorClass, _mapping_names: &[&str])
         -> impl 'a+Error+APIErrorMeta
     {
         WithDetail {
