@@ -145,7 +145,7 @@ pub enum BuiltinAPIErrorMeta {
     /// XMLSyntax Deprecated, 兼容旧服务
     ///
     /// HTTP Mapping: 400 Bad Request
-    ErrXMLSyntax = APIErrorClass::new(
+    XMLSyntax = APIErrorClass::new(
         &*BUILTIN_APP_NAME, 
         "10", 
         "XML format error.", 
@@ -283,7 +283,7 @@ pub enum BuiltinAPIErrorMeta {
     /// already exists.
     ///
     /// HTTP Mapping: 409 Conflict
-    ErrAlreadyExists = APIErrorClass::new(
+    AlreadyExists = APIErrorClass::new(
         &*BUILTIN_APP_NAME, 
         "22", 
         "Already exists.", 
@@ -357,6 +357,5 @@ pub enum BuiltinAPIErrorMeta {
     /// Unrecoverable data loss or corruption.
     ///
     /// HTTP Mapping: 500 Internal Server Error
-    ErrDataLoss = NewAPIErrorClass(APPName, "27", "Data loss.", http.StatusInternalServerError)
-
+    DataLoss = NewAPIErrorClass(APPName, "27", "Data loss.", http.StatusInternalServerError)
 }
