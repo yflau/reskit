@@ -36,7 +36,7 @@ impl<'a> Errorspace<'a> {
     }
 
     pub fn adapt(&self, err: anyhow::Error, default_class: &'a APIErrorClass, mapping_names: &[&str])
-        -> impl 'a+Error + APIErrorMeta 
+        -> impl 'a+Error + APIErrorMeta
     {
         self._adapt(3, err, default_class, mapping_names)
     }
@@ -45,8 +45,8 @@ impl<'a> Errorspace<'a> {
         -> impl 'a+Error+APIErrorMeta
     {
         WithDetail {
-            error: err,
-            meta: default_class, // &*ERR_UNKNOWN,
+            meta: default_class,
+            error: err, // &*ERR_UNKNOWN,
             caller: None,
         }
     }
