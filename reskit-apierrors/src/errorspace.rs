@@ -111,9 +111,11 @@ mod test {
         assert_eq!(space.get_api_error_class("dummy", "1").unwrap().message(), "dummy error");
         assert!(matches!(space.get_api_error_class("dummy", "1").unwrap().status_code(), StatusCode::InternalServerError));
         let rebind_class =APIErrorClass::new("dummy", "1", "dummy error", StatusCode::Ok);
+        space.register_api_error_class(&rebind_class);
+        assert_eq!(space.get_api_error_class("dummy", "1").unwrap().message(), "dummy error");
+        assert!(matches!(space.get_api_error_class("dummy", "1").unwrap().status_code(), StatusCode::InternalServerError));
         space.overwrite_api_error_class(&rebind_class);
         assert_eq!(space.get_api_error_class("dummy", "1").unwrap().message(), "dummy error");
-        assert!(matches!(space.get_api_error_class("dummy", "1").unwrap().status_code(), StatusCode::Ok));
-        
+        assert!(matches!(space.get_api_error_class("dummy", "1").unwrap().status_code(), StatusCode::Ok));   
     }
 }
