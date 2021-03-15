@@ -6,14 +6,14 @@ lazy_static! {
     pub static ref DEFAULT_ERRORSPACE: String = String::from("");
     pub static ref BUILTIN_APP_NAME: String = String::from("");
 
-	/// ERR_SUCCESS 请求成功
+    /// ERR_SUCCESS 请求成功
     /// 
     /// Mapping:
     /// - google api style guide: `google.rpc.Code.OK`
     /// - http status code: 200 OK
     ///
     /// Description:
-	/// Not an error; returned on success
+    /// Not an error; returned on success
     pub static ref ERR_SUCCESS: APIErrorClass = APIErrorClass::new(
         &*BUILTIN_APP_NAME, 
         "0", 
