@@ -15,7 +15,7 @@ pub trait APIErrorMeta {
 pub struct APIErrorClass {
     system: String,
     code: String,
-    message: String, // FIXME: what about &'static str?
+    message: String, // FIXME: what about &'static str? And make APIErrorClass as immutable？
     status: StatusCode,
     pvlost: PVLost,
 }

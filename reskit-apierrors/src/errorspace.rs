@@ -28,6 +28,11 @@ impl<'a> Errorspace<'a> {
         system.entry(String::from(class.code())).or_insert(class);
     }
 
+    pub fn overwrite_api_error_class(&mut self, class: &'a APIErrorClass) {
+        let system = self.errors.entry(String::from(class.system())).or_insert(HashMap::new());
+        system.insert(String::from(class.code()), class);
+    }
+
     pub fn get_api_error_class(&self, system: &str, code: &str) -> Option<&APIErrorClass> {
         match self.errors.get(system) {
             Some(app) => app.get(code).copied(),
@@ -104,5 +109,11 @@ mod test {
         space.register_api_error_class(&class);
         assert_eq!(space.get_api_error_class("", "1").unwrap().code(), "1");
         assert_eq!(space.get_api_error_class("dummy", "1").unwrap().message(), "dummy error");
+        assert!(matches!(space.get_api_error_class("dummy", "1").unwrap().status_code(), StatusCode::InternalServerError));
+        let rebind_class =APIErrorClass::new("dummy", "1", "dummy error", StatusCode::Ok);
+        space.overwrite_api_error_class(&rebind_class);
+        assert_eq!(space.get_api_error_class("dummy", "1").unwrap().message(), "dummy error");
+        assert!(matches!(space.get_api_error_class("dummy", "1").unwrap().status_code(), StatusCode::Ok));
+        
     }
 }
