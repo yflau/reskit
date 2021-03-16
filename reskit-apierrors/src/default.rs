@@ -12,7 +12,6 @@ pub fn overwrite_api_error_class(class: &'static APIErrorClass) {
     space.overwrite_api_error_class(class);
 }
 
-/// FIXME
 pub fn get_api_error_class(system: &str, code: &str) -> Option<APIErrorClass> {
     match DEFAULT_ERRORSPACE.read().unwrap().get_api_error_class(system, code) {
         None => None,

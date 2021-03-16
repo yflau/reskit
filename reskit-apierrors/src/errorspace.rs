@@ -10,29 +10,29 @@ use crate::{APIErrorMeta, APIErrorClass, BUILTIN_APP_NAME, BUILTIN_API_ERROR_CLA
 
 #[derive(Debug)]
 pub struct Errorspace<'a> {
-    errors: HashMap<String, HashMap<String, &'a APIErrorClass>>,
+    errors: HashMap<&'a str, HashMap<&'a str, &'a APIErrorClass>>,
 }
 
 impl<'a> Errorspace<'a> {
     pub fn new() -> Errorspace<'a> {
         let mut space = Errorspace { errors: HashMap::new() };
-        let system = space.errors.entry(String::from(&*BUILTIN_APP_NAME)).or_insert(HashMap::new());
+        let system = space.errors.entry(*BUILTIN_APP_NAME).or_insert(HashMap::new());
         for class in &*BUILTIN_API_ERROR_CLASSES {
-            system.entry(String::from(class.code())).or_insert(class);
+            system.entry(class.code()).or_insert(class);
         }
         space
     }
 
     /// register_api_error_class register api error meta, if exists then ignore
     pub fn register_api_error_class(&mut self, class: &'a APIErrorClass) {
-        let system = self.errors.entry(String::from(class.system())).or_insert(HashMap::new());
-        system.entry(String::from(class.code())).or_insert(class);
+        let system = self.errors.entry(class.system()).or_insert(HashMap::new());
+        system.entry(class.code()).or_insert(class);
     }
 
     /// overwrite_api_error_class overwrite existing api error meta, used for stauts code rebinding
     pub fn overwrite_api_error_class(&mut self, class: &'a APIErrorClass) {
-        let system = self.errors.entry(String::from(class.system())).or_insert(HashMap::new());
-        system.insert(String::from(class.code()), class);
+        let system = self.errors.entry(class.system()).or_insert(HashMap::new());
+        system.insert(class.code(), class);
     }
 
     pub fn get_api_error_class(&self, system: &str, code: &str) -> Option<&APIErrorClass> {
