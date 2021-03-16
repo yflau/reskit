@@ -17,7 +17,7 @@ pub fn get_api_error_class(system: &str, code: &str) -> Option<APIErrorClass> {
         Some(APIErrorClass::new(
             class.system(), 
             class.code(), 
-        class.message(), 
+            class.message(), 
             class.status_code()).with_pvlost(class.pvlost()))
     } else {
         None
