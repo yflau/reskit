@@ -23,11 +23,13 @@ impl<'a> Errorspace<'a> {
         space
     }
 
+    /// register_api_error_class register api error meta, if exists then ignore
     pub fn register_api_error_class(&mut self, class: &'a APIErrorClass) {
         let system = self.errors.entry(String::from(class.system())).or_insert(HashMap::new());
         system.entry(String::from(class.code())).or_insert(class);
     }
 
+    /// overwrite_api_error_class overwrite existing api error meta, used for stauts code rebinding
     pub fn overwrite_api_error_class(&mut self, class: &'a APIErrorClass) {
         let system = self.errors.entry(String::from(class.system())).or_insert(HashMap::new());
         system.insert(String::from(class.code()), class);

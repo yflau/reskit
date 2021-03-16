@@ -9,9 +9,10 @@ pub mod errorspace;
 pub use pvlost::{PVLost};
 pub use apierror::{APIErrorMeta, APIErrorClass};
 pub use init::{
-    DEFAULT_ERRORSPACE, 
+    DEFAULT_ERRORSPACE_NAME, 
     BUILTIN_APP_NAME, 
     BUILTIN_API_ERROR_CLASSES,
+    DEFAULT_ERRORSPACE,
     ERR_SUCCESS,
     ERR_UNKNOWN,
     ERR_INTERNAL,

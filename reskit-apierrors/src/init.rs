@@ -1,9 +1,9 @@
 use http_types::{StatusCode};
 
-use crate::{PVLost, APIErrorClass};
+use crate::{PVLost, APIErrorClass, Errorspace};
 
 lazy_static! {
-    pub static ref DEFAULT_ERRORSPACE: String = String::from("");
+    pub static ref DEFAULT_ERRORSPACE_NAME: String = String::from("");
     pub static ref BUILTIN_APP_NAME: String = String::from("");
 
     /// ERR_SUCCESS 请求成功
@@ -412,16 +412,21 @@ lazy_static! {
         &*ERR_DATA_LOSS,
     ];
 
+    pub static ref DEFAULT_ERRORSPACE: Errorspace<'static> = Errorspace::new();
 }
 
 #[cfg(test)]
 mod test {
+    use http_types::{StatusCode};
+    use crate::{APIErrorMeta, BUILTIN_API_ERROR_CLASSES, DEFAULT_ERRORSPACE};
     #[test]
     fn test_init() {
-        use crate::{APIErrorMeta};
-        use super::{BUILTIN_API_ERROR_CLASSES};
         let code = BUILTIN_API_ERROR_CLASSES.get(0).unwrap().code();
         assert_eq!(code, "0");
-        assert_eq!(module_path!(), "reskit_apierrors::init::test");
+        let err = DEFAULT_ERRORSPACE.get_api_error_class("", "2").unwrap();
+        assert_eq!(err.status_code(), StatusCode::InternalServerError);
+        assert_eq!(err.code(), "2");
+        assert_eq!(err.system(), "");
+        assert_eq!(err.message(), "Failure.");
     }
 }
