@@ -16,10 +16,7 @@ pub struct Errorspace<'a> {
 impl<'a> Errorspace<'a> {
     pub fn new() -> Errorspace<'a> {
         let mut space = Errorspace { errors: HashMap::new() };
-        let system = space.errors.entry(*BUILTIN_APP_NAME).or_insert(HashMap::new());
-        for class in &*BUILTIN_API_ERROR_CLASSES {
-            system.entry(class.code()).or_insert(class);
-        }
+        space.errors.entry(*BUILTIN_APP_NAME).or_insert(HashMap::new());
         space
     }
 
@@ -56,6 +53,16 @@ impl<'a> Errorspace<'a> {
             error: err, // &*ERR_UNKNOWN,
             caller: None,
         }
+    }
+}
+
+impl<'a> Default for Errorspace<'a> {
+    fn default() -> Self {
+        let mut space =Self::new();
+        for class in &*BUILTIN_API_ERROR_CLASSES {
+            space.register_api_error_class(class)
+        }
+        space
     }
 }
 
@@ -106,7 +113,7 @@ mod test {
     fn test_errorspace() {
         use http_types::{StatusCode};
         use super::{Errorspace, APIErrorClass, APIErrorMeta};
-        let mut space = Errorspace::new();
+        let mut space = Errorspace::default();
         let class = APIErrorClass::new("dummy", "1", "dummy error", StatusCode::InternalServerError);
         space.register_api_error_class(&class);
         assert_eq!(space.get_api_error_class("", "1").unwrap().code(), "1");

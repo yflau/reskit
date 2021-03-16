@@ -464,7 +464,7 @@ lazy_static! {
         &*ERR_DATA_LOSS,
     ];
 
-    pub static ref DEFAULT_ERRORSPACE: RwLock<Errorspace<'static>> = RwLock::new(Errorspace::new());
+    pub static ref DEFAULT_ERRORSPACE: RwLock<Errorspace<'static>> = RwLock::new(Errorspace::default());
 }
 
 #[cfg(test)]
