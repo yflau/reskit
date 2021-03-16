@@ -14,7 +14,11 @@ pub fn overwrite_api_error_class(class: &'static APIErrorClass) {
 
 pub fn get_api_error_class(system: &str, code: &str) -> Option<APIErrorClass> {
     if let Some(class) = DEFAULT_ERRORSPACE.read().unwrap().get_api_error_class(system, code) {
-        Some(APIErrorClass::new(class.system(), class.code(), class.message(), class.status_code()))
+        Some(APIErrorClass::new(
+            class.system(), 
+            class.code(), 
+        class.message(), 
+            class.status_code()).with_pvlost(class.pvlost()))
     } else {
         None
     }
