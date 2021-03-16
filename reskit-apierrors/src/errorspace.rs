@@ -8,7 +8,7 @@ use http_types::{StatusCode};
 use crate::{PVLost};
 use crate::{APIErrorMeta, APIErrorClass, BUILTIN_APP_NAME, BUILTIN_API_ERROR_CLASSES};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Errorspace<'a> {
     errors: HashMap<&'a str, HashMap<&'a str, &'a APIErrorClass>>,
 }
@@ -58,7 +58,7 @@ impl<'a> Errorspace<'a> {
 
 impl<'a> Default for Errorspace<'a> {
     fn default() -> Self {
-        let mut space =Self::new();
+        let mut space = Self::new();
         for class in &*BUILTIN_API_ERROR_CLASSES {
             space.register_api_error_class(class)
         }
@@ -109,10 +109,10 @@ impl<'a> APIErrorMeta for WithDetail<'a> {
 
 #[cfg(test)]
 mod test {
+    use http_types::{StatusCode};
+    use super::{Errorspace, APIErrorClass, APIErrorMeta};
     #[test]
     fn test_errorspace() {
-        use http_types::{StatusCode};
-        use super::{Errorspace, APIErrorClass, APIErrorMeta};
         let mut space = Errorspace::default();
         let class = APIErrorClass::new("dummy", "1", "dummy error", StatusCode::InternalServerError);
         space.register_api_error_class(&class);
@@ -126,5 +126,22 @@ mod test {
         space.overwrite_api_error_class(&rebind_class);
         assert_eq!(space.get_api_error_class("dummy", "1").unwrap().message(), "dummy error");
         assert!(matches!(space.get_api_error_class("dummy", "1").unwrap().status_code(), StatusCode::Ok));   
+    }
+
+    #[test]
+    fn test_clone() {
+        let space = Errorspace::default();
+        let mut space_clone = space.clone();
+        assert_eq!(space_clone.get_api_error_class("", "1").unwrap().code(), "1");
+        let class = APIErrorClass::new("dummy", "1", "dummy error", StatusCode::InternalServerError);
+        space_clone.register_api_error_class(&class);
+        assert_eq!(space_clone.get_api_error_class("dummy", "1").unwrap().message(), "dummy error");
+        assert!(matches!(space_clone.get_api_error_class("dummy", "1").unwrap().status_code(), StatusCode::InternalServerError));
+        match space.get_api_error_class("dummy", "1") {
+            None =>{},
+            Some(_class) => {
+                assert!(true, "dummy:1 shoud None in default space");
+            }
+        }
     }
 }

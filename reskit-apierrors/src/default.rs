@@ -12,6 +12,7 @@ pub fn overwrite_api_error_class(class: &'static APIErrorClass) {
     space.overwrite_api_error_class(class);
 }
 
+/// FXIME: how to ref? Or do not use this?
 pub fn get_api_error_class(system: &str, code: &str) -> Option<APIErrorClass> {
     if let Some(class) = DEFAULT_ERRORSPACE.read().unwrap().get_api_error_class(system, code) {
         Some(APIErrorClass::new(
