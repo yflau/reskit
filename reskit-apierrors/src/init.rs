@@ -1,3 +1,5 @@
+use std::sync::RwLock;
+
 use http_types::{StatusCode};
 
 use crate::{PVLost, APIErrorClass, Errorspace};
@@ -412,7 +414,7 @@ lazy_static! {
         &*ERR_DATA_LOSS,
     ];
 
-    pub static ref DEFAULT_ERRORSPACE: Errorspace<'static> = Errorspace::new();
+    pub static ref DEFAULT_ERRORSPACE: RwLock<Errorspace<'static>> = RwLock::new(Errorspace::new());
 }
 
 #[cfg(test)]
@@ -423,7 +425,8 @@ mod test {
     fn test_init() {
         let code = BUILTIN_API_ERROR_CLASSES.get(0).unwrap().code();
         assert_eq!(code, "0");
-        let err = DEFAULT_ERRORSPACE.get_api_error_class("", "2").unwrap();
+        let space = DEFAULT_ERRORSPACE.read().unwrap();
+        let err = space.get_api_error_class("", "2").unwrap();
         assert_eq!(err.status_code(), StatusCode::InternalServerError);
         assert_eq!(err.code(), "2");
         assert_eq!(err.system(), "");

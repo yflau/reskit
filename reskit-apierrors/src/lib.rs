@@ -5,6 +5,7 @@ pub mod pvlost;
 pub mod apierror;
 pub mod init;
 pub mod errorspace;
+pub mod default;
 
 pub use pvlost::{PVLost};
 pub use apierror::{APIErrorMeta, APIErrorClass};
@@ -40,3 +41,8 @@ pub use init::{
     ERR_DATA_LOSS,
 };
 pub use errorspace::{Errorspace};
+pub use default::{
+    // register_api_error_class,
+    // overwrite_api_error_class,
+    get_api_error_class,
+};
