@@ -1,7 +1,8 @@
 use std::fmt::{Display, Result, Formatter};
 
-use crate::{PVLost};
 use http_types::{StatusCode};
+
+use crate::{PVLost};
 
 pub trait APIErrorMeta {
     fn system(&self) -> &str;

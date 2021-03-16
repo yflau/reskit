@@ -111,6 +111,7 @@ impl<'a> APIErrorMeta for WithDetail<'a> {
 mod test {
     use http_types::{StatusCode};
     use super::{Errorspace, APIErrorClass, APIErrorMeta};
+    
     #[test]
     fn test_errorspace() {
         let mut space = Errorspace::default();
