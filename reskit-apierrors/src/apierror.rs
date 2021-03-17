@@ -17,7 +17,7 @@ pub struct APIErrorClass {
     system: String,
     code: String,
     message: String, 
-    status: StatusCode,
+    status: StatusCode, // FIXME: use u16 instead for missing some non-standardcodes, e.g. 499 ?
     pvlost: PVLost,
 }
 
