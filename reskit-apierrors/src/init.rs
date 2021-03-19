@@ -5,7 +5,7 @@ use crate::{Errorspace};
 lazy_static! {
     pub static ref DEFAULT_ERRORSPACE_NAME: &'static str = "";
     pub static ref BUILTIN_APP_NAME: &'static str = "";
-    pub static ref DEFAULT_ERRORSPACE: RwLock<Errorspace<'static>> = RwLock::new(Errorspace::default());
+    pub static ref DEFAULT_ERRORSPACE: RwLock<Errorspace<'static>> = RwLock::new(Errorspace::new());
 }
 
 #[cfg(test)]

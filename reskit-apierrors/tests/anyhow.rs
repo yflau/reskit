@@ -1,13 +1,13 @@
 
 use anyhow::{anyhow, Context, Result};
-use reskit_apierrors::{ERR_SUCCESS, ERR_UNKNOWN};
+use reskit_apierrors::{BuiltinAPIErrorMeta};
 
 #[test]
 fn test_context() {
     fn demo() -> Result<()>{
         Err(anyhow!("demo error"))
     }
-    let result = demo().context(&*ERR_UNKNOWN).context(&*ERR_SUCCESS);
+    let result = demo().context(BuiltinAPIErrorMeta::Unknown).context(BuiltinAPIErrorMeta::Successful);
     match result {
         Err(err)=>{
             assert_eq!(format!("{}", err.root_cause()), "demo error");

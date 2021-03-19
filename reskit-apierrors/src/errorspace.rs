@@ -10,7 +10,7 @@ use crate::{APIErrorMeta, BUILTIN_APP_NAME};
 
 #[derive(Clone)]
 pub struct Errorspace<'a> {
-    errors: HashMap<&'a str, HashMap<&'a str, Box<dyn APIErrorMeta>>>,
+    errors: HashMap<&'a str, HashMap<&'a str, &'a dyn APIErrorMeta>>,
 }
 
 impl<'a> Errorspace<'a> {
@@ -21,13 +21,13 @@ impl<'a> Errorspace<'a> {
     }
 
     /// register_api_error_class register api error meta, if exists then ignore
-    pub fn register_api_error_meta(&mut self, meta: &dyn APIErrorMeta) {
+    pub fn register_api_error_meta(&mut self, meta: &'a dyn APIErrorMeta) {
         let system = self.errors.entry(meta.system()).or_insert(HashMap::new());
         system.entry(meta.code()).or_insert(meta);
     }
 
     /// overwrite_api_error_class overwrite existing api error meta, used for stauts code rebinding
-    pub fn overwrite_api_error_meta(&mut self, meta: &dyn APIErrorMeta) {
+    pub fn overwrite_api_error_meta(&mut self, meta: &'a dyn APIErrorMeta) {
         let system = self.errors.entry(meta.system()).or_insert(HashMap::new());
         system.insert(meta.code(), meta);
     }
@@ -39,14 +39,14 @@ impl<'a> Errorspace<'a> {
         }
     }
 
-    pub fn adapt(&self, err: anyhow::Error, default_meta: &dyn APIErrorMeta, mapping_names: &[&str])
-        -> impl Error + APIErrorMeta
+    pub fn adapt(&self, err: anyhow::Error, default_meta: &'a dyn APIErrorMeta, mapping_names: &[&str])
+        -> impl 'a + Error + APIErrorMeta
     {
         self._adapt(3, err, default_meta, mapping_names)
     }
 
-    fn _adapt(&self, _skip: usize, err: anyhow::Error, default_meta: &dyn APIErrorMeta, _mapping_names: &[&str])
-        -> impl Error + APIErrorMeta
+    fn _adapt(&self, _skip: usize, err: anyhow::Error, default_meta: &'a dyn APIErrorMeta, _mapping_names: &[&str])
+        -> impl 'a + Error + APIErrorMeta
     {
         WithDetail {
             meta: default_meta,
@@ -56,32 +56,32 @@ impl<'a> Errorspace<'a> {
     }
 }
 
-impl<'a> Default for Errorspace<'a> {
-    fn default() -> Self {
+// impl<'a> Default for Errorspace<'a> {
+//     fn default() -> Self {
         
-    }
-}
+//     }
+// }
 
 #[derive(Debug)]
-struct WithDetail<'a, T: APIErrorMeta+Debug> {
-    meta: &'a T,
+struct WithDetail<'a> {
+    meta: &'a dyn APIErrorMeta,
     error: anyhow::Error,
     caller: Option<String>,
 }
 
-impl<'a,T: APIErrorMeta+Debug> Display for WithDetail<'a,T> {
+impl<'a> Display for WithDetail<'a> {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        self.meta.fmt(f) // TODO
+        std::fmt::Display::fmt(self.meta, f) // FIXME: 需要结合meta和error！
     }
 }
 
-impl<'a,T: APIErrorMeta+Debug> Error for WithDetail<'a,T> {
+impl<'a> Error for WithDetail<'a> {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         self.error.source()
     }
 }
 
-impl<'a,T: APIErrorMeta+Debug> APIErrorMeta for WithDetail<'a,T> {
+impl<'a> APIErrorMeta for WithDetail<'a> {
     fn system(&self) -> &str {
         &self.meta.system()
     }

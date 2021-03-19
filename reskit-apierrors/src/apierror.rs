@@ -1,10 +1,10 @@
-use std::fmt::{Display, Result, Formatter};
+use std::fmt::{Display, Result, Formatter, Debug};
 
 use http_types::{StatusCode};
 
 use crate::{PVLost};
 
-pub trait APIErrorMeta {
+pub trait APIErrorMeta: Sync + Send + Debug + Display { // FIXME: add 'static?
     fn system(&self) -> &str;
     fn code(&self) -> &str;
     fn message(&self) -> &str;

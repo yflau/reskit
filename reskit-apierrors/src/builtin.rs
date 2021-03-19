@@ -1,3 +1,5 @@
+use std::fmt::{Display, Result, Formatter, Debug};
+
 use http_types::{StatusCode};
 use strum_macros::{EnumCount, EnumIter, EnumString};
 
@@ -291,6 +293,12 @@ pub enum BuiltinAPIErrorMeta {
     */
     // TODO: #[apierrormeta(system="", code="27", message="Data loss.", status_code=503)]
     DataLoss,
+}
+
+impl Display for BuiltinAPIErrorMeta {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "{}:{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message(), self.pvlost() as u8)
+    }
 }
 
 impl APIErrorMeta for BuiltinAPIErrorMeta {
