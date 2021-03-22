@@ -2,8 +2,19 @@ use std::fmt::{Display, Result, Formatter, Debug};
 
 use http_types::{StatusCode};
 use strum_macros::{EnumCount, EnumIter, EnumString};
+use strum::{IntoEnumIterator};
+use linkme::distributed_slice;
 
-use crate::{APIErrorMeta, PVLost};
+use crate::{APIErrorMeta, PVLost, DEFAULT_ERRORSPACE};
+
+
+#[distributed_slice(INITS)]
+pub(crate) fn init() {
+    let mut space = DEFAULT_ERRORSPACE.write().unwrap();
+    for meta in BuiltinAPIErrorMeta::iter() {
+        space.register_api_error_meta(Box::new(meta));
+    }
+}
 
 #[derive(Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: APIErrorMeta
 pub enum BuiltinAPIErrorMeta {
@@ -360,7 +371,7 @@ mod test {
 
     #[test]
     fn test_iter() {
-        assert_eq!(25, BuiltinAPIErrorMeta::COUNT);
+        assert_eq!(18, BuiltinAPIErrorMeta::COUNT);
         assert_eq!(BuiltinAPIErrorMeta::iter().count(), BuiltinAPIErrorMeta::COUNT);
         assert_eq!(BuiltinAPIErrorMeta::Successful, BuiltinAPIErrorMeta::from_str("Successful").unwrap());
         let mut it = BuiltinAPIErrorMeta::iter();

@@ -12,6 +12,8 @@ pub trait APIErrorMeta: Sync + Send + Debug + Display { // FIXME: add 'static?
     fn pvlost(&self) -> PVLost;
 }
 
+pub trait APIError: APIErrorMeta + std::error::Error{}
+
 #[derive(Debug, PartialEq)]
 pub struct APIErrorClass {
     system: String,

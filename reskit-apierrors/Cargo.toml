@@ -19,6 +19,7 @@ url = "2.1.1"
 lazy_static = "1.4.0"
 strum = "0.20"
 strum_macros = "0.20"
+linkme = "0.2"
 
 # features: serde
 serde_json = { version = "1.0.51", optional = true }
