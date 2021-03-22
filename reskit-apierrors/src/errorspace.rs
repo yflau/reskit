@@ -1,4 +1,4 @@
-use std::{borrow::Borrow, fmt::{Display, Result, Formatter, Debug}};
+use std::{fmt::{Display, Result, Formatter, Debug}};
 use std::collections::HashMap;
 use std::error::{Error};
 
@@ -114,10 +114,12 @@ impl<'a> APIError for WithDetail{}
 #[cfg(test)]
 mod test {
     use http_types::{StatusCode};
-    use crate::{Errorspace, APIErrorClass, DEFAULT_ERRORSPACE, APIError, APIErrorMeta};
+    use reskit_utils::{init_now};
+    use crate::{APIErrorClass, DEFAULT_ERRORSPACE};
     
     #[test]
     fn test_errorspace() {
+        init_now();
         //let mut space = Errorspace::default();
         let mut space = DEFAULT_ERRORSPACE.write().unwrap();
         let class: APIErrorClass = APIErrorClass::new("dummy", "1", "dummy error", StatusCode::InternalServerError);

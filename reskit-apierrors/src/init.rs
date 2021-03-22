@@ -6,7 +6,6 @@ lazy_static! {
     pub static ref DEFAULT_ERRORSPACE_NAME: &'static str = "";
     pub static ref BUILTIN_APP_NAME: &'static str = "";
     pub static ref DEFAULT_ERRORSPACE: RwLock<Errorspace> = RwLock::new(Errorspace::new());
-    //pub static ref INIT: () = init_now();
 }
 
 #[cfg(test)]
@@ -14,6 +13,7 @@ mod test {
     use http_types::{StatusCode};
     use reskit_utils::{INITS, init_now};
     use crate::{DEFAULT_ERRORSPACE};
+        
     #[test]
     fn test_init() {
         init_now();
