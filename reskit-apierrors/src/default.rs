@@ -2,7 +2,7 @@ use strum::{IntoEnumIterator};
 
 use crate::{APIErrorMeta, DEFAULT_ERRORSPACE};
 
-/// register_api_error_class register api error meta, if exists then ignore
+/// register_api_error_metas register APIErrorMetaEnum, if variant exists(system:code) then ignore
 pub fn register_api_error_metas<E>() 
     where E: IntoEnumIterator + APIErrorMeta + 'static
 {
@@ -12,7 +12,7 @@ pub fn register_api_error_metas<E>()
     }
 }
 
-/// overwrite_api_error_class overwrite existing api error meta, used for stauts code rebinding
+/// overwrite_api_error_metas overwrite existing api error meta with APIErrorMetaEnum, used for stauts code rebinding
 pub fn overwrite_api_error_metas<E>() 
     where E: IntoEnumIterator + APIErrorMeta + 'static
 {

@@ -10,7 +10,7 @@ pub mod builtin;
 pub mod macros;
 
 pub use pvlost::{PVLost};
-pub use apierror::{APIErrorMeta, APIError, APIErrorClass};
+pub use apierror::{APIErrorMeta, APIError, APIErrorMetaEnum, APIErrorClass};
 pub use init::{
     DEFAULT_ERRORSPACE_NAME, 
     BUILTIN_APP_NAME,

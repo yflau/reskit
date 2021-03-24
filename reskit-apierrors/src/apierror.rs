@@ -1,9 +1,9 @@
 use std::fmt::{Display, Result, Formatter, Debug};
 
-use http_types::{StatusCode};
+use http_types::StatusCode;
+use strum::IntoEnumIterator;
 
-use crate::{PVLost};
-
+use crate::PVLost;
 pub trait APIErrorMeta: Sync + Send + Debug + Display {
     fn system(&self) -> &str;
     fn code(&self) -> &str;
@@ -14,7 +14,10 @@ pub trait APIErrorMeta: Sync + Send + Debug + Display {
 
 pub trait APIError: APIErrorMeta + std::error::Error{}
 
+pub trait APIErrorMetaEnum: IntoEnumIterator + APIErrorMeta{}
+
 /// APIErrorClass is a APIErrorMeta implementation used for single meta registration, you will not use this usually.
+/// Deprecated, define `APIErrorMetaEnum` instead
 #[derive(Debug, PartialEq)]
 pub struct APIErrorClass {
     system: String,
