@@ -1,13 +1,25 @@
+use strum::{IntoEnumIterator};
+
 use crate::{APIErrorMeta, DEFAULT_ERRORSPACE};
 
 /// register_api_error_class register api error meta, if exists then ignore
-pub fn register_api_error_class(class: Box<dyn APIErrorMeta>) {
-    DEFAULT_ERRORSPACE.write().unwrap().register_api_error_meta(class);
+pub fn register_api_error_metas<E>() 
+    where E: IntoEnumIterator + APIErrorMeta + 'static
+{
+    let mut space = DEFAULT_ERRORSPACE.write().unwrap();
+    for meta in E::iter() {
+        space.register_api_error_meta(Box::new(meta));
+    }
 }
 
 /// overwrite_api_error_class overwrite existing api error meta, used for stauts code rebinding
-pub fn overwrite_api_error_class(class: Box<dyn APIErrorMeta>) {
-    DEFAULT_ERRORSPACE.write().unwrap().overwrite_api_error_meta(class);
+pub fn overwrite_api_error_metas<E>() 
+    where E: IntoEnumIterator + APIErrorMeta + 'static
+{
+    let mut space = DEFAULT_ERRORSPACE.write().unwrap();
+    for meta in E::iter() {
+        space.overwrite_api_error_meta(Box::new(meta));
+    }
 }
 
 /// FXIME: how to ref? Or do not use this?

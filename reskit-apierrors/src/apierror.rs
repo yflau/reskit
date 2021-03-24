@@ -4,7 +4,7 @@ use http_types::{StatusCode};
 
 use crate::{PVLost};
 
-pub trait APIErrorMeta: Sync + Send + Debug + Display { // FIXME: add 'static?
+pub trait APIErrorMeta: Sync + Send + Debug + Display {
     fn system(&self) -> &str;
     fn code(&self) -> &str;
     fn message(&self) -> &str;
@@ -14,6 +14,7 @@ pub trait APIErrorMeta: Sync + Send + Debug + Display { // FIXME: add 'static?
 
 pub trait APIError: APIErrorMeta + std::error::Error{}
 
+/// APIErrorClass is a APIErrorMeta implementation used for single meta registration, you will not use this usually.
 #[derive(Debug, PartialEq)]
 pub struct APIErrorClass {
     system: String,

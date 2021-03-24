@@ -2,22 +2,17 @@ use std::fmt::{Display, Result, Formatter, Debug};
 
 use http_types::{StatusCode};
 use strum_macros::{EnumCount, EnumIter, EnumString};
-use strum::{IntoEnumIterator};
 use linkme::distributed_slice;
 use reskit_utils::{INITS};
 
-use crate::{APIErrorMeta, PVLost, DEFAULT_ERRORSPACE};
-
+use crate::{APIErrorMeta, PVLost, register_api_error_metas};
 
 #[distributed_slice(INITS)]
 pub(crate) fn init() {
-    let mut space = DEFAULT_ERRORSPACE.write().unwrap();
-    for meta in BuiltinAPIErrorMeta::iter() {
-        space.register_api_error_meta(Box::new(meta));
-    }
+    register_api_error_metas::<BuiltinAPIErrorMeta>();
 }
 
-#[derive(Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: APIErrorMeta
+#[derive(Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: APIErrorMeta derive macro！
 pub enum BuiltinAPIErrorMeta {
     /**
     Successful 请求成功

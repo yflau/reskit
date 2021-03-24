@@ -17,8 +17,7 @@ pub use init::{
     DEFAULT_ERRORSPACE};
 pub use errorspace::{Errorspace};
 pub use default::{
-    register_api_error_class,
-    overwrite_api_error_class,
-    //get_api_error_class,
+    register_api_error_metas,
+    overwrite_api_error_metas,
 };
 pub use builtin::{BuiltinAPIErrorMeta};
