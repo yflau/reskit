@@ -1,6 +1,6 @@
 use std::fmt::{Display, Result, Formatter, Debug};
 
-use http_types::{StatusCode};
+use http_types::StatusCode;
 use strum_macros::{EnumCount, EnumIter, EnumString};
 use linkme::distributed_slice;
 use reskit_utils::INITS;

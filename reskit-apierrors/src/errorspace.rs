@@ -1,15 +1,15 @@
-use std::{fmt::{Display, Result, Formatter, Debug}};
+use std::fmt::{Display, Result, Formatter, Debug};
 use std::collections::HashMap;
-use std::error::{Error};
+use std::error::Error;
 
 use anyhow;
-use http_types::{StatusCode};
+use http_types::StatusCode;
 
 use crate::{PVLost, APIErrorMeta, APIError, BUILTIN_APP_NAME};
 
-//#[derive(Clone)] // FIXME
+//#[derive(Clone)] // TODO
 pub struct Errorspace {
-    errors: HashMap<String, HashMap<String, Box<dyn APIErrorMeta>>>,
+    errors: HashMap<String, HashMap<String, Box<dyn APIErrorMeta>>>,  // FIXME: should we use static borrow?
 }
 
 impl Errorspace {
