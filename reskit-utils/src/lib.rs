@@ -1,4 +1,4 @@
 mod macros;
 mod init;
 
-pub use init::{INITS, init_now};
+pub use init::{INITS, init_once};

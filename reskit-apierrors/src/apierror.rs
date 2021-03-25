@@ -4,12 +4,31 @@ use http_types::StatusCode;
 use strum::IntoEnumIterator;
 
 use crate::PVLost;
-pub trait APIErrorMeta: Sync + Send + Debug + Display {
+pub trait APIErrorMeta: Sync + Send + Debug + Display + CloneAPIErrorMeta {
     fn system(&self) -> &str;
     fn code(&self) -> &str;
     fn message(&self) -> &str;
     fn status_code(&self) -> StatusCode;
     fn pvlost(&self) -> PVLost;
+}
+
+pub trait CloneAPIErrorMeta {
+    fn clone_meta<'a>(&self) -> Box<dyn APIErrorMeta>;
+}
+
+impl<T> CloneAPIErrorMeta for T
+where
+    T: APIErrorMeta + Clone + 'static,
+{
+    fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
+        Box::new(self.clone())
+    }
+}
+
+impl Clone for Box<dyn APIErrorMeta> {
+    fn clone(&self) -> Self {
+        self.clone_meta()
+    }
 }
 
 pub trait APIError: APIErrorMeta + std::error::Error{}
@@ -18,7 +37,7 @@ pub trait APIErrorMetaEnum: IntoEnumIterator + APIErrorMeta{} // FIXME: do we ne
 
 /// APIErrorClass is a APIErrorMeta implementation used for single meta registration, you will not use this usually.
 /// Deprecated, define `APIErrorMetaEnum` instead
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct APIErrorClass {
     system: String,
     code: String,
@@ -79,7 +98,8 @@ impl APIErrorMeta for APIErrorClass {
 #[cfg(test)]
 mod test {
     use http_types::{StatusCode};
-    use crate::{APIErrorMeta, APIErrorClass, PVLost};
+    use crate::{APIErrorMeta, PVLost};
+    use super::APIErrorClass;
 
     #[test]
     fn test_api_error_class() {

@@ -1,18 +1,19 @@
 use std::sync::RwLock;
 
+use lazy_static::lazy_static;
+
 use crate::{APIErrorMetaEnum, Errorspace};
 
 lazy_static! {
-    pub static ref DEFAULT_ERRORSPACE_NAME: &'static str = "";
-    pub static ref BUILTIN_APP_NAME: &'static str = "";
-    pub static ref DEFAULT_ERRORSPACE: RwLock<Errorspace> = RwLock::new(Errorspace::new());
+    /// ERRORS is the default `Errorspace`.
+    pub static ref ERRORS: RwLock<Errorspace> = RwLock::new(Errorspace::new());
 }
 
 /// register_api_error_meta_enum register APIErrorMetaEnum, if variant exists(system:code) then ignore
 pub fn register_api_error_meta_enum<E>() 
     where E: APIErrorMetaEnum + 'static
 {
-    let mut space = DEFAULT_ERRORSPACE.write().unwrap();
+    let mut space = ERRORS.write().unwrap();
     for meta in E::iter() {
         space.register_api_error_meta(Box::new(meta));
     }
@@ -22,7 +23,7 @@ pub fn register_api_error_meta_enum<E>()
 pub fn overwrite_api_error_meta_enum<E>() 
     where E: APIErrorMetaEnum + 'static
 {
-    let mut space = DEFAULT_ERRORSPACE.write().unwrap();
+    let mut space = ERRORS.write().unwrap();
     for meta in E::iter() {
         space.overwrite_api_error_meta(Box::new(meta));
     }
@@ -30,20 +31,19 @@ pub fn overwrite_api_error_meta_enum<E>()
 
 /// FXIME: how to ref? Or do not use this?
 // pub fn get_api_error_class(system: &str, code: &str) -> Option<&'static Box<dyn APIErrorMeta>> {
-//     DEFAULT_ERRORSPACE.read().unwrap().get_api_error_meta(system, code)
+//     ERRORS.read().unwrap().get_api_error_meta(system, code)
 // }
 
 #[cfg(test)]
 mod test {
-    use http_types::{StatusCode};
-    use reskit_utils::{INITS, init_now};
-    use crate::{DEFAULT_ERRORSPACE};
+    use http_types::StatusCode;
+    use reskit_utils::init_once;
+    use crate::ERRORS;
         
     #[test]
     fn test_init() {
-        init_now();
-        assert_eq!(1, INITS.len());
-        let space = DEFAULT_ERRORSPACE.read().unwrap();
+        init_once();
+        let space = ERRORS.read().unwrap();
         let err = space.get_api_error_meta("", "2").unwrap();
         assert_eq!(err.status_code(), StatusCode::InternalServerError);
         assert_eq!(err.code(), "2");

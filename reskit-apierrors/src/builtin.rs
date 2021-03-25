@@ -12,7 +12,7 @@ pub(crate) fn init() {
     register_api_error_meta_enum::<BuiltinAPIErrorMeta>();
 }
 
-#[derive(Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: impl APIErrorMetaEnum derive macro！
+#[derive(Clone, Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: impl APIErrorMetaEnum derive macro！
 pub enum BuiltinAPIErrorMeta {
     /**
     Successful 请求成功

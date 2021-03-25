@@ -5,18 +5,16 @@ use std::error::Error;
 use anyhow;
 use http_types::StatusCode;
 
-use crate::{PVLost, APIErrorMeta, APIError, BUILTIN_APP_NAME};
+use crate::{PVLost, APIErrorMeta, APIError, CloneAPIErrorMeta};
 
-//#[derive(Clone)] // TODO
+#[derive(Clone)]
 pub struct Errorspace {
     errors: HashMap<String, HashMap<String, Box<dyn APIErrorMeta>>>,  // FIXME: should we use static borrow?
 }
 
 impl Errorspace {
     pub fn new() -> Errorspace {
-        let mut space = Errorspace { errors: HashMap::new() };
-        space.errors.entry(String::from(*BUILTIN_APP_NAME)).or_insert(HashMap::new());
-        space
+        Errorspace { errors: HashMap::new() }
     }
 
     /// register_api_error_class register api error meta, if exists then ignore
@@ -62,12 +60,6 @@ impl Errorspace {
     }
 }
 
-// impl<'a> Default for Errorspace<'a> {
-//     fn default() -> Self {
-//         DEFAULT_ERRORSPACE.read().unwrap()
-//     }
-// }
-
 #[derive(Debug)]
 struct WithDetail {
     meta: Box<dyn APIErrorMeta>,
@@ -84,6 +76,12 @@ impl Display for WithDetail {
 impl Error for WithDetail {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         self.error.source()
+    }
+}
+
+impl CloneAPIErrorMeta for WithDetail {
+    fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
+        self.meta.clone()
     }
 }
 
@@ -113,15 +111,15 @@ impl<'a> APIError for WithDetail{}
 
 #[cfg(test)]
 mod test {
-    use http_types::{StatusCode};
-    use reskit_utils::{init_now};
-    use crate::{APIErrorClass, DEFAULT_ERRORSPACE};
-    
+    use http_types::StatusCode;
+    use reskit_utils::init_once;
+    use crate::ERRORS;
+    use crate::apierror::APIErrorClass; // FIXME
+   
     #[test]
     fn test_errorspace() {
-        init_now();
-        //let mut space = Errorspace::default();
-        let mut space = DEFAULT_ERRORSPACE.write().unwrap();
+        init_once();
+        let mut space = ERRORS.write().unwrap();
         let class: APIErrorClass = APIErrorClass::new("dummy", "1", "dummy error", StatusCode::InternalServerError);
         space.register_api_error_meta(Box::new(class));
         assert_eq!(space.get_api_error_meta("", "1").unwrap().code(), "1");
@@ -137,21 +135,23 @@ mod test {
         assert!(matches!(space.get_api_error_meta("dummy", "1").unwrap().status_code(), StatusCode::Ok));   
     }
 
-    // #[test]
-    // fn test_clone() {
-    //     //let space = Errorspace::default();
-    //     let space = DEFAULT_ERRORSPACE.read().unwrap();
-    //     let mut space_clone = space.clone();
-    //     assert_eq!(space_clone.get_api_error_meta("", "1").unwrap().code(), "1");
-    //     let class = APIErrorClass::new("dummy", "1", "dummy error", StatusCode::InternalServerError);
-    //     space_clone.register_api_error_meta(&class);
-    //     assert_eq!(space_clone.get_api_error_meta("dummy", "1").unwrap().message(), "dummy error");
-    //     assert!(matches!(space_clone.get_api_error_meta("dummy", "1").unwrap().status_code(), StatusCode::InternalServerError));
-    //     match space.get_api_error_meta("dummy", "1") {
-    //         None =>{},
-    //         Some(_class) => {
-    //             assert!(true, "dummy:1 shoud None in default space");
-    //         }
-    //     }
-    // }
+    #[test]
+    fn test_clone() {
+        init_once();
+        let space = ERRORS.read().unwrap();
+        let mut space_clone = space.clone();
+        assert_eq!(space_clone.get_api_error_meta("", "1").unwrap().code(), "1");
+        let class = APIErrorClass::new("dummy_clone", "1", "dummy error", StatusCode::InternalServerError);
+        space_clone.register_api_error_meta(Box::new(class));
+        assert_eq!(space.len("dummy_clone"), 0);
+        assert_eq!(space_clone.len("dummy_clone"), 1);
+        assert_eq!(space_clone.get_api_error_meta("dummy_clone", "1").unwrap().message(), "dummy error");
+        assert!(matches!(space_clone.get_api_error_meta("dummy_clone", "1").unwrap().status_code(), StatusCode::InternalServerError));
+        match space.get_api_error_meta("dummy_clone", "1") {
+            None =>{},
+            Some(_class) => {
+                assert!(true, "dummy:1 shoud None in default space");
+            }
+        }
+    }
 }
