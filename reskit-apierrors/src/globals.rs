@@ -1,6 +1,14 @@
+use std::sync::RwLock;
+
 use strum::{IntoEnumIterator};
 
-use crate::{APIErrorMeta, DEFAULT_ERRORSPACE};
+use crate::{APIErrorMeta, Errorspace};
+
+lazy_static! {
+    pub static ref DEFAULT_ERRORSPACE_NAME: &'static str = "";
+    pub static ref BUILTIN_APP_NAME: &'static str = "";
+    pub static ref DEFAULT_ERRORSPACE: RwLock<Errorspace> = RwLock::new(Errorspace::new());
+}
 
 /// register_api_error_metas register APIErrorMetaEnum, if variant exists(system:code) then ignore
 pub fn register_api_error_metas<E>() 
@@ -29,6 +37,22 @@ pub fn overwrite_api_error_metas<E>()
 
 #[cfg(test)]
 mod test {
+    use http_types::{StatusCode};
+    use reskit_utils::{INITS, init_now};
+    use crate::{DEFAULT_ERRORSPACE};
+        
+    #[test]
+    fn test_init() {
+        init_now();
+        assert_eq!(1, INITS.len());
+        let space = DEFAULT_ERRORSPACE.read().unwrap();
+        let err = space.get_api_error_meta("", "2").unwrap();
+        assert_eq!(err.status_code(), StatusCode::InternalServerError);
+        assert_eq!(err.code(), "2");
+        assert_eq!(err.system(), "");
+        assert_eq!(err.message(), "Failure.");
+    }
+
     // #[test]
     // fn test_default_errorspace() {
     //     use http_types::{StatusCode};
