@@ -2,10 +2,10 @@ use std::fmt::{Display, Result, Formatter, Debug};
 use std::collections::HashMap;
 use std::error::Error;
 
-use anyhow;
+use anyhow::anyhow;
 use http_types::StatusCode;
 
-use crate::{PVLost, APIErrorMeta, APIError, CloneAPIErrorMeta};
+use crate::{PVLost, APIErrorMeta, APIError};
 
 #[derive(Clone)]
 pub struct Errorspace {
@@ -79,9 +79,13 @@ impl Error for WithDetail {
     }
 }
 
-impl CloneAPIErrorMeta for WithDetail {
-    fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
-        self.meta.clone()
+impl Clone for WithDetail {
+    fn clone(&self) -> Self {
+        Self {
+            meta: self.meta.clone(),
+            caller: self.caller.clone(),
+            error: anyhow!("{:?}", self.error), // FIXME: how to clone anyhow::Error or use borrow?
+        }
     }
 }
 

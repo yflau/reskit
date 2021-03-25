@@ -2,9 +2,10 @@ use std::fmt::{Display, Result, Formatter, Debug};
 
 use http_types::StatusCode;
 use strum::IntoEnumIterator;
+use dyn_clone::DynClone;
 
 use crate::PVLost;
-pub trait APIErrorMeta: Sync + Send + Debug + Display + CloneAPIErrorMeta {
+pub trait APIErrorMeta: Sync + Send + Debug + Display + DynClone {
     fn system(&self) -> &str;
     fn code(&self) -> &str;
     fn message(&self) -> &str;
@@ -12,24 +13,7 @@ pub trait APIErrorMeta: Sync + Send + Debug + Display + CloneAPIErrorMeta {
     fn pvlost(&self) -> PVLost;
 }
 
-pub trait CloneAPIErrorMeta {
-    fn clone_meta<'a>(&self) -> Box<dyn APIErrorMeta>;
-}
-
-impl<T> CloneAPIErrorMeta for T
-where
-    T: APIErrorMeta + Clone + 'static,
-{
-    fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
-        Box::new(self.clone())
-    }
-}
-
-impl Clone for Box<dyn APIErrorMeta> {
-    fn clone(&self) -> Self {
-        self.clone_meta()
-    }
-}
+dyn_clone::clone_trait_object!(APIErrorMeta);
 
 pub trait APIError: APIErrorMeta + std::error::Error{}
 

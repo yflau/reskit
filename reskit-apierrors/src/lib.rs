@@ -6,7 +6,7 @@ pub mod builtin;
 pub mod macros;
 
 pub use pvlost::{PVLost};
-pub use apierror::{APIErrorMeta, APIError, APIErrorMetaEnum, CloneAPIErrorMeta};
+pub use apierror::{APIErrorMeta, APIError, APIErrorMetaEnum};
 pub use globals::{
     ERRORS,
     register_api_error_meta_enum,
