@@ -1,8 +1,6 @@
 use std::sync::RwLock;
 
-use strum::{IntoEnumIterator};
-
-use crate::{APIErrorMeta, Errorspace};
+use crate::{APIErrorMetaEnum, Errorspace};
 
 lazy_static! {
     pub static ref DEFAULT_ERRORSPACE_NAME: &'static str = "";
@@ -10,9 +8,9 @@ lazy_static! {
     pub static ref DEFAULT_ERRORSPACE: RwLock<Errorspace> = RwLock::new(Errorspace::new());
 }
 
-/// register_api_error_metas register APIErrorMetaEnum, if variant exists(system:code) then ignore
-pub fn register_api_error_metas<E>() 
-    where E: IntoEnumIterator + APIErrorMeta + 'static
+/// register_api_error_meta_enum register APIErrorMetaEnum, if variant exists(system:code) then ignore
+pub fn register_api_error_meta_enum<E>() 
+    where E: APIErrorMetaEnum + 'static
 {
     let mut space = DEFAULT_ERRORSPACE.write().unwrap();
     for meta in E::iter() {
@@ -20,9 +18,9 @@ pub fn register_api_error_metas<E>()
     }
 }
 
-/// overwrite_api_error_metas overwrite existing api error meta with APIErrorMetaEnum, used for stauts code rebinding
-pub fn overwrite_api_error_metas<E>() 
-    where E: IntoEnumIterator + APIErrorMeta + 'static
+/// overwrite_api_error_meta_enum overwrite existing api error meta with APIErrorMetaEnum, used for stauts code rebinding
+pub fn overwrite_api_error_meta_enum<E>() 
+    where E: APIErrorMetaEnum + 'static
 {
     let mut space = DEFAULT_ERRORSPACE.write().unwrap();
     for meta in E::iter() {

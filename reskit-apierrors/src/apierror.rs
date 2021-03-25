@@ -14,7 +14,7 @@ pub trait APIErrorMeta: Sync + Send + Debug + Display {
 
 pub trait APIError: APIErrorMeta + std::error::Error{}
 
-pub trait APIErrorMetaEnum: IntoEnumIterator + APIErrorMeta{}
+pub trait APIErrorMetaEnum: IntoEnumIterator + APIErrorMeta{} // FIXME: do we need this?
 
 /// APIErrorClass is a APIErrorMeta implementation used for single meta registration, you will not use this usually.
 /// Deprecated, define `APIErrorMetaEnum` instead

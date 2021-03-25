@@ -14,7 +14,7 @@ pub use globals::{
     DEFAULT_ERRORSPACE_NAME, 
     BUILTIN_APP_NAME,
     DEFAULT_ERRORSPACE,
-    register_api_error_metas,
-    overwrite_api_error_metas};
+    register_api_error_meta_enum,
+    overwrite_api_error_meta_enum};
 pub use errorspace::{Errorspace};
 pub use builtin::{BuiltinAPIErrorMeta};

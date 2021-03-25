@@ -5,14 +5,14 @@ use strum_macros::{EnumCount, EnumIter, EnumString};
 use linkme::distributed_slice;
 use reskit_utils::INITS;
 
-use crate::{APIErrorMeta, PVLost, register_api_error_metas};
+use crate::{APIErrorMeta, APIErrorMetaEnum, PVLost, register_api_error_meta_enum};
 
 #[distributed_slice(INITS)]
 pub(crate) fn init() {
-    register_api_error_metas::<BuiltinAPIErrorMeta>();
+    register_api_error_meta_enum::<BuiltinAPIErrorMeta>();
 }
 
-#[derive(Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: APIErrorMeta derive macro！
+#[derive(Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: impl APIErrorMetaEnum derive macro！
 pub enum BuiltinAPIErrorMeta {
     /**
     Successful 请求成功
@@ -352,6 +352,8 @@ impl APIErrorMeta for BuiltinAPIErrorMeta {
         }
     }
 }
+
+impl APIErrorMetaEnum for BuiltinAPIErrorMeta {} // FIXME: do we need this?
 
 #[cfg(test)]
 mod test {
