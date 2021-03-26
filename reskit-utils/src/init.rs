@@ -17,25 +17,21 @@ pub fn init_once() {
 
 #[cfg(test)]
 mod test {
-    use std::sync::Mutex;
+    use std::sync::atomic::{AtomicUsize, Ordering};
     use linkme::distributed_slice;
-    use lazy_static::lazy_static;
     use crate::{INITS, init_once};
 
     #[test]
     fn test_init() {
         assert_eq!(1, INITS.len());
-        lazy_static!{
-            pub static ref FOO: Mutex<i8> = Mutex::new(0);
-        }
+        static COUNTER: AtomicUsize = AtomicUsize::new(0);
         #[distributed_slice(INITS)]
         fn init_test() {
-            let mut num = FOO.lock().unwrap();
-            *num += 1;
+            COUNTER.fetch_add(1, Ordering::SeqCst);
         }
         assert_eq!(1, INITS.len());
         init_once();
         init_once();
-        assert_eq!(*FOO.lock().unwrap(), 1);
+        assert_eq!(COUNTER.load(Ordering::SeqCst), 1);
     }
 }
