@@ -17,24 +17,25 @@ pub fn init_once() {
 
 #[cfg(test)]
 mod test {
+    use std::sync::Mutex;
     use linkme::distributed_slice;
+    use lazy_static::lazy_static;
     use crate::{INITS, init_once};
 
     #[test]
     fn test_init() {
         assert_eq!(1, INITS.len());
-        static mut FOO: i8 = 0;
+        lazy_static!{
+            pub static ref FOO: Mutex<i8> = Mutex::new(0);
+        }
         #[distributed_slice(INITS)]
         fn init_test() {
-            unsafe{
-                FOO += 1;
-            }
+            let mut num = FOO.lock().unwrap();
+            *num += 1;
         }
         assert_eq!(1, INITS.len());
         init_once();
         init_once();
-        unsafe{
-            assert_eq!(FOO, 1);
-        }      
+        assert_eq!(*FOO.lock().unwrap(), 1);
     }
 }
