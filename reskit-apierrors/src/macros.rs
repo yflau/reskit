@@ -8,3 +8,30 @@
 //     Unknown,
 // }
 //
+
+// macro_rules! adapt_errorspace_with_skip {
+//     () => {
+//      
+//     };
+// }
+
+// // equals to: adapt_errorspace(space, ...) = adapt_errorspace_with_skip!(space, 3, ...)
+// macro_rules! adapt_errorspace {
+//     () => {
+//
+//     };
+// }
+
+// // equals to: adapt_skip(skip, ...) = adapt_errorspace_with_skip("", skip, ...)
+// macro_rules! adapt_skip {
+//     () => {
+//        
+//     };
+// }
+
+// // equals to: adapt(...) = adapt_errorspace!("", ...)
+// macro_rules! adapt {
+//     () => {
+//        
+//     };
+// }

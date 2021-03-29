@@ -9,3 +9,7 @@ edition = "2018"
 [dependencies]
 linkme = "0.2"
 lazy_static = "1.4.0"
+shadow-rs = "0.5"
+
+[build-dependencies]
+shadow-rs = "0.5"

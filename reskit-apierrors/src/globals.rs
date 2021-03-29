@@ -7,6 +7,8 @@ use crate::{APIErrorMetaEnum, Errorspace};
 lazy_static! {
     /// ERRORS is the default `Errorspace`.
     pub static ref ERRORS: RwLock<Errorspace> = RwLock::new(Errorspace::new());
+
+    //pub static ref ERRORSPACES: RwLock<HashMap<String, Errorspace>> = RwLock.new();
 }
 
 /// register_api_error_meta_enum register APIErrorMetaEnum, if variant exists(system:code) then ignore

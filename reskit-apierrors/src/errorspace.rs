@@ -1,11 +1,10 @@
-use std::fmt::{Display, Result, Formatter, Debug};
 use std::collections::HashMap;
-use std::error::Error;
 
 use anyhow;
-use http_types::StatusCode;
 
-use crate::{PVLost, APIErrorMeta, APIError, CloneAPIErrorMeta};
+use reskit_utils::caller;
+use crate::{APIErrorMeta, APIError};
+use crate::apierror::APIErrorImpl;
 
 #[derive(Clone)]
 pub struct Errorspace {
@@ -43,71 +42,32 @@ impl Errorspace {
         }
     }
 
-    pub fn adapt(&self, err: anyhow::Error, default_meta: Box<dyn APIErrorMeta>, mapping_names: &[&str])
-        -> impl APIError
+    pub fn adapt<'a>(&self, err: &'a anyhow::Error, default_meta: &'a Box<dyn APIErrorMeta>, mapping_names: &[&str])
+        -> Box<dyn APIError + 'a>
     {
         self._adapt(3, err, default_meta, mapping_names)
     }
 
-    fn _adapt(&self, _skip: usize, err: anyhow::Error, default_meta: Box<dyn APIErrorMeta>, _mapping_names: &[&str])
-        -> impl APIError
+    fn _adapt<'a>(&self, _skip: usize, err: &'a anyhow::Error, default_meta: &'a Box<dyn APIErrorMeta>, _mapping_names: &[&str])
+        -> Box<dyn APIError + 'a>
     {
-        WithDetail {
+        Box::new(APIErrorImpl {
             meta: default_meta,
-            error: err, // &*ERR_UNKNOWN,
+            error: err,
+            caller: Some(String::from(caller!(_skip))),
+        })
+    }
+
+    fn _force<'a>(&self, err: &'a anyhow::Error, meta: &'a Box<dyn APIErrorMeta>, _mapping_names: &[&str])
+        -> Box<dyn APIError + 'a>
+    {
+        Box::new(APIErrorImpl {
+            meta: meta,
+            error: err,
             caller: None,
-        }
+        })
     }
 }
-
-#[derive(Debug)]
-struct WithDetail {
-    meta: Box<dyn APIErrorMeta>,
-    error: anyhow::Error,
-    caller: Option<String>,
-}
-
-impl Display for WithDetail {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        std::fmt::Display::fmt(&self.meta, f) // FIXME: 需要结合meta和error！
-    }
-}
-
-impl Error for WithDetail {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        self.error.source()
-    }
-}
-
-impl CloneAPIErrorMeta for WithDetail {
-    fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
-        self.meta.clone()
-    }
-}
-
-impl APIErrorMeta for WithDetail {
-    fn system(&self) -> &str {
-        &self.meta.system()
-    }
-
-    fn code(&self) -> &str {
-        &self.meta.code()
-    }
-
-    fn message(&self) -> &str {
-        &self.meta.message()
-    }
-
-    fn status_code(&self) -> StatusCode {
-        self.meta.status_code()
-    }
-
-    fn pvlost(&self) -> PVLost {
-        self.meta.pvlost()
-    }
-}
-
-impl<'a> APIError for WithDetail{}
 
 #[cfg(test)]
 mod test {

@@ -1,9 +1,12 @@
 use std::fmt::{Display, Result, Formatter, Debug};
+use std::error::Error;
 
 use http_types::StatusCode;
 use strum::IntoEnumIterator;
+use anyhow;
 
 use crate::PVLost;
+
 pub trait APIErrorMeta: Sync + Send + Debug + Display + CloneAPIErrorMeta {
     fn system(&self) -> &str;
     fn code(&self) -> &str;
@@ -34,6 +37,55 @@ impl Clone for Box<dyn APIErrorMeta> {
 pub trait APIError: APIErrorMeta + std::error::Error{}
 
 pub trait APIErrorMetaEnum: IntoEnumIterator + APIErrorMeta{} // FIXME: do we need this?
+
+#[derive(Debug)]
+pub(crate) struct APIErrorImpl<'a> {
+    pub(crate) meta: &'a Box<dyn APIErrorMeta>,
+    pub(crate) error: &'a anyhow::Error,
+    pub(crate) caller: Option<String>,
+}
+
+impl<'a> Display for APIErrorImpl<'a> {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        std::fmt::Display::fmt(&self.meta, f) // FIXME: 需要结合meta和error！
+    }
+}
+
+impl<'a>  Error for APIErrorImpl<'a> {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        self.error.source()
+    }
+}
+
+impl<'a>  CloneAPIErrorMeta for APIErrorImpl<'a>  {
+    fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
+        self.meta.clone()
+    }
+}
+
+impl<'a>  APIErrorMeta for APIErrorImpl<'a>  {
+    fn system(&self) -> &str {
+        &self.meta.system()
+    }
+
+    fn code(&self) -> &str {
+        &self.meta.code()
+    }
+
+    fn message(&self) -> &str {
+        &self.meta.message()
+    }
+
+    fn status_code(&self) -> StatusCode {
+        self.meta.status_code()
+    }
+
+    fn pvlost(&self) -> PVLost {
+        self.meta.pvlost()
+    }
+}
+
+impl<'a> APIError for APIErrorImpl<'a> {}
 
 /// APIErrorClass is a APIErrorMeta implementation used for single meta registration, you will not use this usually.
 /// Deprecated, define `APIErrorMetaEnum` instead
