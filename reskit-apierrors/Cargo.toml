@@ -13,7 +13,6 @@ serde = ["serde_qs", "serde_crate", "serde_json", "serde_urlencoded", "url/serde
 [dependencies]
 thiserror = "1.0"
 anyhow = "1.0"
-enum-display-derive = "0.1.1"
 http-types = "2.10.0"
 url = "2.1.1"
 lazy_static = "1.4.0"

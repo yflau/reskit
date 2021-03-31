@@ -1,5 +1,6 @@
 use std::fmt::{Display, Result, Formatter, Debug};
 use std::error::Error;
+use std::collections::HashMap;
 
 use http_types::StatusCode;
 use strum::IntoEnumIterator;
@@ -34,36 +35,36 @@ impl Clone for Box<dyn APIErrorMeta> {
     }
 }
 
-pub trait APIError: APIErrorMeta + std::error::Error{}
+//pub trait APIError: APIErrorMeta + std::error::Error{}
 
 pub trait APIErrorMetaEnum: IntoEnumIterator + APIErrorMeta{} // FIXME: do we need this?
 
 #[derive(Debug)]
-pub(crate) struct APIErrorImpl<'a> {
-    pub(crate) meta: &'a Box<dyn APIErrorMeta>,
-    pub(crate) error: &'a anyhow::Error,
-    pub(crate) caller: Option<String>,
+pub struct APIError<'a> {
+    pub meta: &'a Box<dyn APIErrorMeta>,
+    pub error: anyhow::Error,
+    pub meta_data: Option<HashMap<&'a str, &'a str>>,
 }
 
-impl<'a> Display for APIErrorImpl<'a> {
+impl<'a> Display for APIError<'a> {
     fn fmt(&self, f: &mut Formatter) -> Result {
         std::fmt::Display::fmt(&self.meta, f) // FIXME: 需要结合meta和error！
     }
 }
 
-impl<'a>  Error for APIErrorImpl<'a> {
+impl<'a>  Error for APIError<'a> {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         self.error.source()
     }
 }
 
-impl<'a>  CloneAPIErrorMeta for APIErrorImpl<'a>  {
+impl<'a>  CloneAPIErrorMeta for APIError<'a>  {
     fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
         self.meta.clone()
     }
 }
 
-impl<'a>  APIErrorMeta for APIErrorImpl<'a>  {
+impl<'a>  APIErrorMeta for APIError<'a>  {
     fn system(&self) -> &str {
         &self.meta.system()
     }
@@ -85,7 +86,7 @@ impl<'a>  APIErrorMeta for APIErrorImpl<'a>  {
     }
 }
 
-impl<'a> APIError for APIErrorImpl<'a> {}
+//impl<'a> APIError for APIErrorImpl<'a> {}
 
 /// APIErrorClass is a APIErrorMeta implementation used for single meta registration, you will not use this usually.
 /// Deprecated, define `APIErrorMetaEnum` instead
@@ -148,7 +149,7 @@ impl APIErrorMeta for APIErrorClass {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use http_types::{StatusCode};
     use crate::{APIErrorMeta, PVLost};
     use super::APIErrorClass;

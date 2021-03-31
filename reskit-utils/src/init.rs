@@ -16,7 +16,7 @@ pub fn init_once() {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use std::sync::atomic::{AtomicUsize, Ordering};
     use linkme::distributed_slice;
     use crate::{INITS, init_once};

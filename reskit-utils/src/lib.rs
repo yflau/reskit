@@ -9,7 +9,7 @@ mod init;
 pub use init::{INITS, init_once};
 
 #[cfg(test)]
-mod test {
+mod tests {
     #[test]
     fn test_version() {
         shadow!(build);

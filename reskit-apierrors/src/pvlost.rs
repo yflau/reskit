@@ -200,7 +200,7 @@ mod serde {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use std::convert::{TryFrom, TryInto};
     use super::PVLost;
     

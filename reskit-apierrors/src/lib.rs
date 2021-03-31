@@ -20,7 +20,7 @@ pub use globals::{
     overwrite_api_error_meta_enum};
 
 #[cfg(test)]
-mod test {
+mod tests {
     #[test]
     fn test_version() {
         shadow!(build);

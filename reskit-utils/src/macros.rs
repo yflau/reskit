@@ -46,7 +46,7 @@ macro_rules! fn_name {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     #[test]
     fn macros_test() {
         assert_eq!(caller!(), "reskit_utils::macros::test::macros_test");

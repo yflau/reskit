@@ -37,7 +37,7 @@ pub fn overwrite_api_error_meta_enum<E>()
 // }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use http_types::StatusCode;
     use reskit_utils::init_once;
     use crate::ERRORS;

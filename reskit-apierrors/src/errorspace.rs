@@ -2,9 +2,7 @@ use std::collections::HashMap;
 
 use anyhow;
 
-use reskit_utils::caller;
 use crate::{APIErrorMeta, APIError};
-use crate::apierror::APIErrorImpl;
 
 #[derive(Clone)]
 pub struct Errorspace {
@@ -42,38 +40,45 @@ impl Errorspace {
         }
     }
 
-    pub fn adapt<'a>(&self, err: &'a anyhow::Error, default_meta: &'a Box<dyn APIErrorMeta>, mapping_names: &[&str])
-        -> Box<dyn APIError + 'a>
+    pub fn adapt<'a>(&'a self, err: anyhow::Error, default_meta: &'a Box<dyn APIErrorMeta>, _mapping_names: &[&str])
+        -> APIError
     {
-        self._adapt(3, err, default_meta, mapping_names)
+        let api_err: APIError;
+        if let Some(ae) = err.downcast_ref::<APIError>() {
+            let meta = self.get_api_error_meta(ae.system(), ae.code());
+            api_err = APIError {
+                meta: meta.unwrap(),
+                error: err,
+                meta_data: None,
+            }
+        } else {
+            api_err = APIError {
+                meta: &Box::new(default_meta),
+                error: err,
+                meta_data: None,
+            }
+        }
+        api_err
     }
 
-    fn _adapt<'a>(&self, _skip: usize, err: &'a anyhow::Error, default_meta: &'a Box<dyn APIErrorMeta>, _mapping_names: &[&str])
-        -> Box<dyn APIError + 'a>
+    pub fn force<'a>(&'a self, err: anyhow::Error, meta: &'a Box<dyn APIErrorMeta>, _mapping_names: &[&str])
+        -> APIError
     {
-        Box::new(APIErrorImpl {
-            meta: default_meta,
+        APIError {
+            meta,
             error: err,
-            caller: Some(String::from(caller!(_skip))),
-        })
-    }
-
-    fn _force<'a>(&self, err: &'a anyhow::Error, meta: &'a Box<dyn APIErrorMeta>, _mapping_names: &[&str])
-        -> Box<dyn APIError + 'a>
-    {
-        Box::new(APIErrorImpl {
-            meta: meta,
-            error: err,
-            caller: None,
-        })
+            meta_data: None,
+        }
     }
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use http_types::StatusCode;
     use reskit_utils::init_once;
+    use anyhow::{anyhow, Result};
     use crate::ERRORS;
+
     use crate::apierror::APIErrorClass; // FIXME
    
     #[test]
@@ -113,5 +118,29 @@ mod test {
                 assert!(true, "dummy:1 shoud None in default space");
             }
         }
+    }
+
+    #[test]
+    fn test_adapt() {
+        init_once();
+        fn demo() -> Result<()>{
+            Err(anyhow!("demo error"))
+        }
+        let space = ERRORS.read().unwrap();
+        let default_meta = space.get_api_error_meta("", "1").unwrap();
+        let result = demo().map_err(|e| space.adapt(e, default_meta, &[]));
+        match result {
+            Err(err)=>{
+                //assert_eq!(format!("{}", err.root_cause()), "demo error");
+                assert_eq!(format!("{}", err), "500::1:Unexpected error.:2"); // FIXME: 需要类似Debug的调用链表示
+                assert_eq!(format!("{:?}", err), "APIError { meta: Unknown, error: demo error, meta_data: None }");
+            },
+            _ => {},
+        }
+    }
+
+    #[test]
+    fn test_force() {
+        
     }
 }

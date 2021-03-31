@@ -356,7 +356,7 @@ impl APIErrorMeta for BuiltinAPIErrorMeta {
 impl APIErrorMetaEnum for BuiltinAPIErrorMeta {} // FIXME: do we need this?
 
 #[cfg(test)]
-mod test {
+mod tests {
     use std::str::FromStr;
     use strum::{EnumCount, IntoEnumIterator};
     use super::{BuiltinAPIErrorMeta, APIErrorMeta};
