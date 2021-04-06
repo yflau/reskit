@@ -2,7 +2,7 @@ use std::sync::RwLock;
 
 use lazy_static::lazy_static;
 
-use crate::{Errorspace, APIErrorMetas};
+use crate::{Errorspace, APIErrorMeta, APIErrorMetas};
 
 lazy_static! {
     /// ERRORS is the default `Errorspace`.
@@ -31,10 +31,10 @@ pub fn overwrite_api_error_meta_enum<E>()
     }
 }
 
-/// FXIME: how to ref? Or do not use this?
-// pub fn get_api_error_class(system: &str, code: &str) -> Option<&'static Box<dyn APIErrorMeta>> {
-//     ERRORS.read().unwrap().get_api_error_meta(system, code)
-// }
+/// get_api_error_meta get api error meta for specified systen & code
+pub fn get_api_error_meta(system: &str, code: &str) -> Option<&'static dyn APIErrorMeta> {
+    ERRORS.read().unwrap().get_api_error_meta(system, code)
+}
 
 #[cfg(test)]
 mod tests {
@@ -53,12 +53,12 @@ mod tests {
         assert_eq!(err.message(), "Failure.");
     }
 
-    // #[test]
-    // fn test_default_errorspace() {
-    //     use http_types::{StatusCode};
-    //     use crate::{APIErrorMeta};
-    //     use super::{get_api_error_class};
-    //     assert_eq!(get_api_error_class("", "1").unwrap().message(), "Unexpected error.");
-    //     assert!(matches!(get_api_error_class("", "1").unwrap().status_code(), StatusCode::InternalServerError));   
-    // }
+    #[test]
+    fn test_default_errorspace() {
+        init_once();
+        use http_types::{StatusCode};
+        use super::get_api_error_meta;
+        assert_eq!(get_api_error_meta("", "1").unwrap().message(), "Unexpected error.");
+        assert!(matches!(get_api_error_meta("", "1").unwrap().status_code(), StatusCode::InternalServerError));   
+    }
 }
