@@ -2,32 +2,32 @@ use std::sync::RwLock;
 
 use lazy_static::lazy_static;
 
-use crate::{APIErrorMetaEnum, Errorspace};
+use crate::{Errorspace, APIErrorMetas};
 
 lazy_static! {
     /// ERRORS is the default `Errorspace`.
-    pub static ref ERRORS: RwLock<Errorspace> = RwLock::new(Errorspace::new());
+    pub static ref ERRORS: RwLock<Errorspace<'static>> = RwLock::new(Errorspace::new());
 
     //pub static ref ERRORSPACES: RwLock<HashMap<String, Errorspace>> = RwLock.new();
 }
 
 /// register_api_error_meta_enum register APIErrorMetaEnum, if variant exists(system:code) then ignore
 pub fn register_api_error_meta_enum<E>() 
-    where E: APIErrorMetaEnum + 'static
+    where E: APIErrorMetas + 'static
 {
     let mut space = ERRORS.write().unwrap();
-    for meta in E::iter() {
-        space.register_api_error_meta(Box::new(meta));
+    for meta in E::api_error_metas() {
+        space.register_api_error_meta(meta);
     }
 }
 
 /// overwrite_api_error_meta_enum overwrite existing api error meta with APIErrorMetaEnum, used for stauts code rebinding
 pub fn overwrite_api_error_meta_enum<E>() 
-    where E: APIErrorMetaEnum + 'static
+    where E: APIErrorMetas + 'static
 {
     let mut space = ERRORS.write().unwrap();
-    for meta in E::iter() {
-        space.overwrite_api_error_meta(Box::new(meta));
+    for meta in E::api_error_metas() {
+        space.overwrite_api_error_meta(meta);
     }
 }
 

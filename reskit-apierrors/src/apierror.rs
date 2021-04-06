@@ -8,7 +8,7 @@ use anyhow;
 
 use crate::PVLost;
 
-pub trait APIErrorMeta: Sync + Send + Debug + Display + CloneAPIErrorMeta {
+pub trait APIErrorMeta: Sync + Send + Debug + Display {
     fn system(&self) -> &str;
     fn code(&self) -> &str;
     fn message(&self) -> &str;
@@ -16,24 +16,28 @@ pub trait APIErrorMeta: Sync + Send + Debug + Display + CloneAPIErrorMeta {
     fn pvlost(&self) -> PVLost;
 }
 
-pub trait CloneAPIErrorMeta {
-    fn clone_meta<'a>(&self) -> Box<dyn APIErrorMeta>;
+pub trait APIErrorMetas {
+    fn api_error_metas() -> Vec<&'static dyn APIErrorMeta>;
 }
 
-impl<T> CloneAPIErrorMeta for T
-where
-    T: APIErrorMeta + Clone + 'static,
-{
-    fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
-        Box::new(self.clone())
-    }
-}
+// pub trait CloneAPIErrorMeta {
+//     fn clone_meta<'a>(&self) -> Box<dyn APIErrorMeta>;
+// }
 
-impl Clone for Box<dyn APIErrorMeta> {
-    fn clone(&self) -> Self {
-        self.clone_meta()
-    }
-}
+// impl<T> CloneAPIErrorMeta for T
+// where
+//     T: APIErrorMeta + Clone + 'static,
+// {
+//     fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
+//         Box::new(self.clone())
+//     }
+// }
+
+// impl Clone for Box<dyn APIErrorMeta> {
+//     fn clone(&self) -> Self {
+//         self.clone_meta()
+//     }
+// }
 
 //pub trait APIError: APIErrorMeta + std::error::Error{}
 
@@ -41,7 +45,7 @@ pub trait APIErrorMetaEnum: IntoEnumIterator + APIErrorMeta{} // FIXME: do we ne
 
 #[derive(Debug)]
 pub struct APIError<'a> {
-    pub meta: &'a Box<dyn APIErrorMeta>,
+    pub meta: &'a dyn APIErrorMeta,
     pub error: anyhow::Error,
     pub meta_data: Option<HashMap<&'a str, &'a str>>,
 }
@@ -58,11 +62,11 @@ impl<'a>  Error for APIError<'a> {
     }
 }
 
-impl<'a>  CloneAPIErrorMeta for APIError<'a>  {
-    fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
-        self.meta.clone()
-    }
-}
+// impl<'a>  CloneAPIErrorMeta for APIError<'a>  {
+//     fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
+//         self.meta.clone()
+//     }
+// }
 
 impl<'a>  APIErrorMeta for APIError<'a>  {
     fn system(&self) -> &str {

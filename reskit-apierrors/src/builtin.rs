@@ -5,14 +5,14 @@ use strum_macros::{EnumCount, EnumIter, EnumString};
 use linkme::distributed_slice;
 use reskit_utils::INITS;
 
-use crate::{APIErrorMeta, APIErrorMetaEnum, PVLost, register_api_error_meta_enum};
+use crate::{APIErrorMeta, APIErrorMetas, APIErrorMetaEnum, PVLost, register_api_error_meta_enum};
 
 #[distributed_slice(INITS)]
 pub(crate) fn init() {
     register_api_error_meta_enum::<BuiltinAPIErrorMeta>();
 }
 
-#[derive(Clone, Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: impl APIErrorMetaEnum derive macro！
+#[derive(Clone, Copy, Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: impl APIErrorMetaEnum derive macro！
 pub enum BuiltinAPIErrorMeta {
     /**
     Successful 请求成功
@@ -302,6 +302,7 @@ pub enum BuiltinAPIErrorMeta {
     DataLoss,
 }
 
+
 impl Display for BuiltinAPIErrorMeta {
     fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "{}:{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message(), self.pvlost() as u8)
@@ -353,13 +354,23 @@ impl APIErrorMeta for BuiltinAPIErrorMeta {
     }
 }
 
+impl APIErrorMetas for BuiltinAPIErrorMeta {
+    fn api_error_metas() -> Vec<&'static dyn APIErrorMeta> {
+        vec![
+            &Self::Successful,
+            &Self::Unknown,
+            &Self::Internal,
+        ]
+    }
+}
+
 impl APIErrorMetaEnum for BuiltinAPIErrorMeta {} // FIXME: do we need this?
 
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
     use strum::{EnumCount, IntoEnumIterator};
-    use super::{BuiltinAPIErrorMeta, APIErrorMeta};
+    use crate::{BuiltinAPIErrorMeta, APIErrorMeta};
 
     #[test]
     fn test_meta() {
@@ -376,5 +387,15 @@ mod tests {
         assert_eq!(Some(BuiltinAPIErrorMeta::Successful), it.next());
         assert_eq!(Some(BuiltinAPIErrorMeta::Unknown), it.next());
         assert_eq!(Some(BuiltinAPIErrorMeta::Internal), it.next());
+    }
+
+    #[test]
+    fn test_lifetime() {
+        fn enum_as_static(meta: &'static dyn APIErrorMeta) -> &'static dyn APIErrorMeta {
+            meta
+        }
+        let meta = enum_as_static(&BuiltinAPIErrorMeta::Unknown);
+        assert_eq!(meta.code(), "1");
+        assert_eq!(meta.system(), "");
     }
 }
