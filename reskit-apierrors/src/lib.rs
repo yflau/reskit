@@ -17,7 +17,8 @@ pub use builtin::BuiltinAPIErrorMeta;
 pub use globals::{
     ERRORS,
     register_api_error_meta_enum,
-    overwrite_api_error_meta_enum};
+    overwrite_api_error_meta_enum,
+    adapt, force};
 
 #[cfg(test)]
 mod tests {

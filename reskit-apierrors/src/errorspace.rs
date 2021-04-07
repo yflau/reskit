@@ -6,7 +6,7 @@ use crate::{APIErrorMeta, APIError};
 
 #[derive(Clone)]
 pub struct Errorspace<'a> {
-    errors: HashMap<&'a str, HashMap<&'a str, &'a dyn APIErrorMeta>>,  // FIXME: should we use static borrow?
+    errors: HashMap<&'a str, HashMap<&'a str, &'a dyn APIErrorMeta>>,
 }
 
 // static ERRORSPACE: Lazy<RwLock<Errorspace>> = Lazy::new(|| {
@@ -48,6 +48,7 @@ impl<'a> Errorspace<'a> {
         }
     }
 
+    /// adapt adapts anyhow::Error to specify error space, or wrap it with default_meta as a APIError
     pub fn adapt(&self, err: anyhow::Error, default_meta: &'a dyn APIErrorMeta, _mapping_names: &[&str])
         -> APIError<'a>
     {
@@ -66,9 +67,11 @@ impl<'a> Errorspace<'a> {
                 meta_data: None,
             }
         }
+        // TODO: map to other error spaces
         api_err
     }
 
+    /// force wraps the anyhow::Error with given meta as a APIError
     pub fn force(&self, err: anyhow::Error, meta: &'a dyn APIErrorMeta, _mapping_names: &[&str])
         -> APIError<'a>
     {
@@ -85,10 +88,9 @@ mod tests {
     use http_types::StatusCode;
     use reskit_utils::init_once;
     use anyhow::{anyhow, Result, Context};
-    use crate::{ERRORS, BuiltinAPIErrorMeta};
-
+    use crate::{ERRORS, BuiltinAPIErrorMeta, adapt, force};
     use crate::apierror::APIErrorClass; // FIXME
-   
+
     // FIXME: 完成apierrors_derive后修复此测试！
     // #[test]
     // fn test_errorspace() {
@@ -129,28 +131,30 @@ mod tests {
         }
     }
 
+    fn demo() -> Result<()>{
+        Err(anyhow!("demo error"))
+    }
+
     #[test]
     fn test_adapt() {
         init_once();
-        fn demo() -> Result<()>{
-            Err(anyhow!("demo error"))
-        }
-        let space = ERRORS.read().unwrap();
-        let result = demo().context("pre").map_err(|e| {
-            space.adapt(e, &BuiltinAPIErrorMeta::Unknown, &[])
-        });
+        let result = demo()
+            .context("first")
+            .map_err(|e| adapt(e, &BuiltinAPIErrorMeta::Unknown, &[]))
+            .map_err(|e| adapt(e, &BuiltinAPIErrorMeta::Internal, &[]));
         match result {
             Err(err)=>{
-                //assert_eq!(format!("{}", err.root_cause()), "demo error");
-                //assert_eq!(format!("{}", err), "500::1:Unexpected error.:2"); // FIXME: 需要类似Debug的调用链表示
-                assert_eq!(format!("{:?}", err), "APIError { meta: Unknown, error: pre\n\nCaused by:\n    demo error, meta_data: None }");
+                assert_eq!(format!("{}", err.root_cause()), "demo error");
+                assert_eq!(format!("{}", err), "500::1:Unexpected error.:2"); // FIXME: 需要类似Debug的调用链表示
+                assert_eq!(format!("{:?}", err), "500::1:Unexpected error.:2\n\nCaused by:\n    demo error");
             },
             _ => {},
         }
 
-        let result = demo().context("pre").map_err(|e| {
-            space.adapt(e, &BuiltinAPIErrorMeta::Unknown, &[])
-        }).context("post");
+        let result = demo()
+            .context("pre")
+            .map_err(|e| adapt(e, &BuiltinAPIErrorMeta::Unknown, &[]))
+            .context("post");
         match result {
             Err(err)=>{
                 //assert_eq!(format!("{}", err.root_cause()), "demo error");
@@ -163,6 +167,19 @@ mod tests {
 
     #[test]
     fn test_force() {
-        
+        init_once();
+        let result = demo()
+            .context("first")
+            .map_err(|e| adapt(e, &BuiltinAPIErrorMeta::Unknown, &[]))
+            .context("second")
+            .map_err(|e| force(e, &BuiltinAPIErrorMeta::Internal, &[]));
+        match result {
+            Err(err)=>{
+                assert_eq!(format!("{}", err.root_cause()), "demo error");
+                assert_eq!(format!("{}", err), "500::2:Failure.:2"); // FIXME: 需要类似Debug的调用链表示
+                assert_eq!(format!("{:?}", err), "500::2:Failure.:2\n\nCaused by:\n    0: 500::1:Unexpected error.:2\n    1: demo error");
+            },
+            _ => {},
+        }
     }
 }

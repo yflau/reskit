@@ -36,6 +36,18 @@ pub fn get_api_error_meta(system: &str, code: &str) -> Option<&'static dyn APIEr
     ERRORS.read().unwrap().get_api_error_meta(system, code)
 }
 
+/// adapt adapts anyhow::Error to specify error space, or wrap it with default_meta as a APIError in global error space
+pub fn adapt(err: anyhow::Error, default_meta: &'static dyn APIErrorMeta, _mapping_names: &[&str]) -> anyhow::Error {
+    let api_err = ERRORS.read().unwrap().adapt(err, default_meta, _mapping_names);
+    anyhow::Error::new(api_err)
+}
+
+/// force wraps the anyhow::Error with given meta as a APIError in global error space
+pub fn force(err: anyhow::Error, default_meta: &'static dyn APIErrorMeta, _mapping_names: &[&str]) -> anyhow::Error {
+    let api_err = ERRORS.read().unwrap().force(err, default_meta, _mapping_names);
+    anyhow::Error::new(api_err)
+}
+
 #[cfg(test)]
 mod tests {
     use http_types::StatusCode;

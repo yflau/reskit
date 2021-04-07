@@ -309,7 +309,7 @@ impl Display for BuiltinAPIErrorMeta {
     }
 }
 
-impl APIErrorMeta for BuiltinAPIErrorMeta {
+impl APIErrorMeta for BuiltinAPIErrorMeta { // FIXME: derive
     fn system(&self) -> &str {
         match self {
             Self::Successful => "",
@@ -349,18 +349,18 @@ impl APIErrorMeta for BuiltinAPIErrorMeta {
     fn pvlost(&self) -> PVLost {
         match self {
             Self::Successful => PVLost::Successful,
+            Self::DataSourceFailure => PVLost::RemoteError,
             _ => PVLost::LocalError,
         }
     }
 }
 
-impl APIErrorMetas for BuiltinAPIErrorMeta {
+impl APIErrorMetas for BuiltinAPIErrorMeta { // FIXME: derive
     fn api_error_metas() -> Vec<&'static dyn APIErrorMeta> {
         vec![
             &Self::Successful,
             &Self::Unknown,
             &Self::Internal,
-            // FIXME
         ]
     }
 }
