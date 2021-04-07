@@ -12,9 +12,7 @@ lazy_static! {
 }
 
 /// register_api_error_meta_enum register APIErrorMetaEnum, if variant exists(system:code) then ignore
-pub fn register_api_error_meta_enum<E>() 
-    where E: APIErrorMetas + 'static
-{
+pub fn register_api_error_meta_enum<E>() where E: APIErrorMetas + 'static {
     let mut space = ERRORS.write().unwrap();
     for meta in E::api_error_metas() {
         space.register_api_error_meta(meta);
@@ -22,9 +20,7 @@ pub fn register_api_error_meta_enum<E>()
 }
 
 /// overwrite_api_error_meta_enum overwrite existing api error meta with APIErrorMetaEnum, used for stauts code rebinding
-pub fn overwrite_api_error_meta_enum<E>() 
-    where E: APIErrorMetas + 'static
-{
+pub fn overwrite_api_error_meta_enum<E>() where E: APIErrorMetas + 'static {
     let mut space = ERRORS.write().unwrap();
     for meta in E::api_error_metas() {
         space.overwrite_api_error_meta(meta);

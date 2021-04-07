@@ -88,7 +88,7 @@ mod tests {
     use http_types::StatusCode;
     use reskit_utils::init_once;
     use anyhow::{anyhow, Result, Context};
-    use crate::{ERRORS, BuiltinAPIErrorMeta, adapt, force};
+    use crate::{ERRORS, Builtin, adapt, force};
     use crate::apierror::APIErrorClass; // FIXME
 
     // FIXME: 完成apierrors_derive后修复此测试！
@@ -140,8 +140,8 @@ mod tests {
         init_once();
         let result = demo()
             .context("first")
-            .map_err(|e| adapt(e, &BuiltinAPIErrorMeta::Unknown, &[]))
-            .map_err(|e| adapt(e, &BuiltinAPIErrorMeta::Internal, &[]));
+            .map_err(|e| adapt(e, &Builtin::Unknown, &[]))
+            .map_err(|e| adapt(e, &Builtin::Internal, &[]));
         match result {
             Err(err)=>{
                 assert_eq!(format!("{}", err.root_cause()), "demo error");
@@ -153,7 +153,7 @@ mod tests {
 
         let result = demo()
             .context("pre")
-            .map_err(|e| adapt(e, &BuiltinAPIErrorMeta::Unknown, &[]))
+            .map_err(|e| adapt(e, &Builtin::Unknown, &[]))
             .context("post");
         match result {
             Err(err)=>{
@@ -170,9 +170,9 @@ mod tests {
         init_once();
         let result = demo()
             .context("first")
-            .map_err(|e| adapt(e, &BuiltinAPIErrorMeta::Unknown, &[]))
+            .map_err(|e| adapt(e, &Builtin::Unknown, &[]))
             .context("second")
-            .map_err(|e| force(e, &BuiltinAPIErrorMeta::Internal, &[]));
+            .map_err(|e| force(e, &Builtin::Internal, &[]));
         match result {
             Err(err)=>{
                 assert_eq!(format!("{}", err.root_cause()), "demo error");

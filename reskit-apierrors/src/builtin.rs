@@ -9,11 +9,12 @@ use crate::{APIErrorMeta, APIErrorMetas, APIErrorMetaEnum, PVLost, register_api_
 
 #[distributed_slice(INITS)]
 pub(crate) fn init() {
-    register_api_error_meta_enum::<BuiltinAPIErrorMeta>();
+    register_api_error_meta_enum::<Builtin>();
 }
 
+/// Builtin defines the builtin api error metas
 #[derive(Clone, Copy, Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: impl APIErrorMetaEnum derive macro！
-pub enum BuiltinAPIErrorMeta {
+pub enum Builtin {
     /**
     Successful 请求成功
 
@@ -303,13 +304,13 @@ pub enum BuiltinAPIErrorMeta {
 }
 
 
-impl Display for BuiltinAPIErrorMeta {
+impl Display for Builtin {
     fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "{}:{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message(), self.pvlost() as u8)
     }
 }
 
-impl APIErrorMeta for BuiltinAPIErrorMeta { // FIXME: derive
+impl APIErrorMeta for Builtin { // FIXME: derive
     fn system(&self) -> &str {
         match self {
             Self::Successful => "",
@@ -355,7 +356,7 @@ impl APIErrorMeta for BuiltinAPIErrorMeta { // FIXME: derive
     }
 }
 
-impl APIErrorMetas for BuiltinAPIErrorMeta { // FIXME: derive
+impl APIErrorMetas for Builtin { // FIXME: derive
     fn api_error_metas() -> Vec<&'static dyn APIErrorMeta> {
         vec![
             &Self::Successful,
@@ -365,29 +366,29 @@ impl APIErrorMetas for BuiltinAPIErrorMeta { // FIXME: derive
     }
 }
 
-impl APIErrorMetaEnum for BuiltinAPIErrorMeta {} // FIXME: do we need this?
+impl APIErrorMetaEnum for Builtin {} // FIXME: do we need this?
 
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
     use strum::{EnumCount, IntoEnumIterator};
-    use crate::{BuiltinAPIErrorMeta, APIErrorMeta};
+    use crate::{Builtin, APIErrorMeta};
 
     #[test]
     fn test_meta() {
-        assert_eq!(BuiltinAPIErrorMeta::Successful.message(), "Successful.");
-        assert_eq!(BuiltinAPIErrorMeta::Unknown.message(), "Unexpected error.");
+        assert_eq!(Builtin::Successful.message(), "Successful.");
+        assert_eq!(Builtin::Unknown.message(), "Unexpected error.");
     }
 
     #[test]
     fn test_iter() {
-        assert_eq!(18, BuiltinAPIErrorMeta::COUNT);
-        assert_eq!(BuiltinAPIErrorMeta::iter().count(), BuiltinAPIErrorMeta::COUNT);
-        assert_eq!(BuiltinAPIErrorMeta::Successful, BuiltinAPIErrorMeta::from_str("Successful").unwrap());
-        let mut it = BuiltinAPIErrorMeta::iter();
-        assert_eq!(Some(BuiltinAPIErrorMeta::Successful), it.next());
-        assert_eq!(Some(BuiltinAPIErrorMeta::Unknown), it.next());
-        assert_eq!(Some(BuiltinAPIErrorMeta::Internal), it.next());
+        assert_eq!(18, Builtin::COUNT);
+        assert_eq!(Builtin::iter().count(), Builtin::COUNT);
+        assert_eq!(Builtin::Successful, Builtin::from_str("Successful").unwrap());
+        let mut it = Builtin::iter();
+        assert_eq!(Some(Builtin::Successful), it.next());
+        assert_eq!(Some(Builtin::Unknown), it.next());
+        assert_eq!(Some(Builtin::Internal), it.next());
     }
 
     #[test]
@@ -395,7 +396,7 @@ mod tests {
         fn enum_as_static(meta: &'static dyn APIErrorMeta) -> &'static dyn APIErrorMeta {
             meta
         }
-        let meta = enum_as_static(&BuiltinAPIErrorMeta::Unknown);
+        let meta = enum_as_static(&Builtin::Unknown);
         assert_eq!(meta.code(), "1");
         assert_eq!(meta.system(), "");
     }

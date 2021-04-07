@@ -20,27 +20,6 @@ pub trait APIErrorMetas {
     fn api_error_metas() -> Vec<&'static dyn APIErrorMeta>;
 }
 
-// pub trait CloneAPIErrorMeta {
-//     fn clone_meta<'a>(&self) -> Box<dyn APIErrorMeta>;
-// }
-
-// impl<T> CloneAPIErrorMeta for T
-// where
-//     T: APIErrorMeta + Clone + 'static,
-// {
-//     fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
-//         Box::new(self.clone())
-//     }
-// }
-
-// impl Clone for Box<dyn APIErrorMeta> {
-//     fn clone(&self) -> Self {
-//         self.clone_meta()
-//     }
-// }
-
-//pub trait APIError: APIErrorMeta + std::error::Error{}
-
 pub trait APIErrorMetaEnum: IntoEnumIterator + APIErrorMeta{} // FIXME: do we need this?
 
 #[derive(Debug)]
@@ -61,12 +40,6 @@ impl<'a>  Error for APIError<'a> {
         self.error.source()
     }
 }
-
-// impl<'a>  CloneAPIErrorMeta for APIError<'a>  {
-//     fn clone_meta(&self) -> Box<dyn APIErrorMeta> {
-//         self.meta.clone()
-//     }
-// }
 
 impl<'a>  APIErrorMeta for APIError<'a>  {
     fn system(&self) -> &str {
@@ -89,8 +62,6 @@ impl<'a>  APIErrorMeta for APIError<'a>  {
         self.meta.pvlost()
     }
 }
-
-//impl<'a> APIError for APIErrorImpl<'a> {}
 
 /// APIErrorClass is a APIErrorMeta implementation used for single meta registration, you will not use this usually.
 /// Deprecated, define `APIErrorMetaEnum` instead

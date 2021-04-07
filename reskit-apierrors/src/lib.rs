@@ -13,7 +13,7 @@ pub mod macros;
 pub use pvlost::PVLost;
 pub use apierror::{APIErrorMeta, APIErrorMetas, APIError, APIErrorMetaEnum};
 pub use errorspace::Errorspace;
-pub use builtin::BuiltinAPIErrorMeta;
+pub use builtin::Builtin;
 pub use globals::{
     ERRORS,
     register_api_error_meta_enum,
