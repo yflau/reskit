@@ -88,7 +88,7 @@ mod tests {
     use http_types::StatusCode;
     use reskit_utils::init_once;
     use anyhow::{anyhow, Result, Context};
-    use crate::{ERRORS, Builtin, adapt, force};
+    use crate::{ERRORSPACE, Builtin, adapt, force};
     use crate::apierror::APIErrorClass; // FIXME
 
     // FIXME: 完成apierrors_derive后修复此测试！
@@ -96,7 +96,7 @@ mod tests {
     // fn test_errorspace() {
     //     init_once();
     //     let class: APIErrorClass = APIErrorClass::new("dummy", "1", "dummy error", StatusCode::InternalServerError);
-    //     let mut space = ERRORS.write().unwrap();
+    //     let mut space = ERRORSPACE.write().unwrap();
     //     space.register_api_error_meta(&class);
     //     assert_eq!(space.get_api_error_meta("", "1").unwrap().code(), "1");
     //     assert_eq!(space.get_api_error_meta("dummy", "1").unwrap().message(), "dummy error");
@@ -114,7 +114,7 @@ mod tests {
     #[test]
     fn test_clone() {
         init_once();
-        let space = ERRORS.read().unwrap();
+        let space = ERRORSPACE.read().unwrap();
         let mut space_clone = space.clone();
         assert_eq!(space_clone.get_api_error_meta("", "1").unwrap().code(), "1");
         let class = APIErrorClass::new("dummy_clone", "1", "dummy error", StatusCode::InternalServerError);

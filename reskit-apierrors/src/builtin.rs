@@ -5,11 +5,11 @@ use strum_macros::{EnumCount, EnumIter, EnumString};
 use linkme::distributed_slice;
 use reskit_utils::INITS;
 
-use crate::{APIErrorMeta, APIErrorMetas, APIErrorMetaEnum, PVLost, register_api_error_meta_enum};
+use crate::{APIErrorMeta, APIErrorMetas, APIErrorMetaEnum, PVLost, register_api_error_metas};
 
 #[distributed_slice(INITS)]
 pub(crate) fn init() {
-    register_api_error_meta_enum::<Builtin>();
+    register_api_error_metas::<Builtin>();
 }
 
 /// Builtin defines the builtin api error metas

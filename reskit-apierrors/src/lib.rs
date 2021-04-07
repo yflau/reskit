@@ -15,9 +15,9 @@ pub use apierror::{APIErrorMeta, APIErrorMetas, APIError, APIErrorMetaEnum};
 pub use errorspace::Errorspace;
 pub use builtin::Builtin;
 pub use globals::{
-    ERRORS,
-    register_api_error_meta_enum,
-    overwrite_api_error_meta_enum,
+    ERRORSPACE,
+    register_api_error_metas,
+    overwrite_api_error_metas,
     adapt, force};
 
 #[cfg(test)]
