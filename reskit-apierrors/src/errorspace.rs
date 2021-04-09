@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use anyhow;
-
 use crate::{APIErrorMeta, APIError};
 
 #[derive(Clone)]
@@ -49,7 +47,7 @@ impl<'a> Errorspace<'a> {
     }
 
     /// adapt adapts anyhow::Error to specify error space, or wrap it with default_meta as a APIError
-    pub fn adapt(&self, err: anyhow::Error, default_meta: &'a dyn APIErrorMeta, _mapping_names: &[&str])
+    pub fn adapt(&self, err: anyhow::Error, default_meta: &'static dyn APIErrorMeta, _mapping_names: &[&str])
         -> APIError<'a>
     {
         let api_err: APIError;
@@ -88,7 +86,7 @@ mod tests {
     use http_types::StatusCode;
     use reskit_utils::init_once;
     use anyhow::{anyhow, Result, Context};
-    use crate::{ERRORSPACE, Builtin, adapt, force};
+    use crate::{ERRORSPACES, Builtin, adapt, force};
     use crate::apierror::APIErrorClass; // FIXME
 
     // FIXME: 完成apierrors_derive后修复此测试！
@@ -96,7 +94,8 @@ mod tests {
     // fn test_errorspace() {
     //     init_once();
     //     let class: APIErrorClass = APIErrorClass::new("dummy", "1", "dummy error", StatusCode::InternalServerError);
-    //     let mut space = ERRORSPACE.write().unwrap();
+    //     let mut spaces = ERRORSPACES.write().unwrap();
+    //     let space = spaces.get_mut("").unwrap();
     //     space.register_api_error_meta(&class);
     //     assert_eq!(space.get_api_error_meta("", "1").unwrap().code(), "1");
     //     assert_eq!(space.get_api_error_meta("dummy", "1").unwrap().message(), "dummy error");
@@ -114,7 +113,8 @@ mod tests {
     #[test]
     fn test_clone() {
         init_once();
-        let space = ERRORSPACE.read().unwrap();
+        let mut spaces = ERRORSPACES.write().unwrap();
+        let space = spaces.get_mut("").unwrap();
         let mut space_clone = space.clone();
         assert_eq!(space_clone.get_api_error_meta("", "1").unwrap().code(), "1");
         let class = APIErrorClass::new("dummy_clone", "1", "dummy error", StatusCode::InternalServerError);

@@ -15,7 +15,10 @@ pub use apierror::{APIErrorMeta, APIErrorMetas, APIError, APIErrorMetaEnum};
 pub use errorspace::Errorspace;
 pub use builtin::Builtin;
 pub use globals::{
-    ERRORSPACE,
+    ERRORSPACES,
+    new_errorspace,
+    register_errorspace,
+    clone_errorspace,
     register_api_error_metas,
     overwrite_api_error_metas,
     adapt, force};
