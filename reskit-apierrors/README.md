@@ -5,7 +5,7 @@
 ## TODO
 
 - customize Debug & Display
-- register all error spaces
+- errorspace registry: done
 - pvlost feature gate
 - test harness with setup & teardown
 - derive macro & adapt & force macro

@@ -32,3 +32,7 @@ reskit-utils = { path = "../reskit-utils" }
 
 [build-dependencies]
 shadow-rs = "0.5"
+
+
+[workspace]
+members = ["derive"]

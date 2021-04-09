@@ -52,7 +52,6 @@ pub fn register_api_error_metas_errorspace<T>(name: &str) where T: APIErrorMetas
     }
 }
 
-
 /// register_api_error_metas register APIErrorMetas, if variant exists(system:code) then ignore
 pub fn register_api_error_metas<T>() where T: APIErrorMetas + 'static {
     register_api_error_metas_errorspace::<T>(GLOBAL_ERRORSPACE_NAME);

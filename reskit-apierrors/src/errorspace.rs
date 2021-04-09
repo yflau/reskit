@@ -7,15 +7,7 @@ pub struct Errorspace<'a> {
     errors: HashMap<&'a str, HashMap<&'a str, &'a dyn APIErrorMeta>>,
 }
 
-// static ERRORSPACE: Lazy<RwLock<Errorspace>> = Lazy::new(|| {
-//     RwLock::new(Errorspace::new())
-// });
-
 impl<'a> Errorspace<'a> {
-    // pub fn global() -> &'static Errorspace {
-    //     ERRORSPACE.get().expect("global error space is not initialized")
-    // }
-
     pub fn new() -> Errorspace<'a> {
         Errorspace { errors: HashMap::new() }
     }
@@ -78,6 +70,12 @@ impl<'a> Errorspace<'a> {
             error: err,
             meta_data: None,
         }
+    }
+
+    /// map map the anyhow::Error with specified mappings
+    fn _map(&self, err: anyhow::Error, mapping_names: &[&str]) -> anyhow::Error {
+        dbg!("{}{}", err, mapping_names);
+        anyhow::anyhow!("TODO")
     }
 }
 
