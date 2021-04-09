@@ -48,13 +48,13 @@ impl<'a> Errorspace<'a> {
             api_err = APIError {
                 meta: meta.unwrap(),
                 error: err,
-                meta_data: None,
+                extra: None,
             }
         } else {
             api_err = APIError {
                 meta: default_meta,
                 error: err,
-                meta_data: None,
+                extra: None,
             }
         }
         // TODO: map to other error spaces
@@ -68,7 +68,7 @@ impl<'a> Errorspace<'a> {
         APIError {
             meta,
             error: err,
-            meta_data: None,
+            extra: None,
         }
     }
 

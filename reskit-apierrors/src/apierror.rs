@@ -26,7 +26,7 @@ pub trait APIErrorMetaEnum: IntoEnumIterator + APIErrorMeta{} // FIXME: do we ne
 pub struct APIError<'a> {
     pub meta: &'a dyn APIErrorMeta,
     pub error: anyhow::Error,
-    pub meta_data: Option<HashMap<&'a str, &'a str>>,
+    pub extra: Option<HashMap<&'a str, &'a str>>,
 }
 
 impl<'a> Display for APIError<'a> {
