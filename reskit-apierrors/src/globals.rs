@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use lazy_static::lazy_static;
 use linkme::distributed_slice;
-use reskit_utils::INITS;
+use reskit_utils::INIT_FNS;
 use anyhow::Result;
 
 use crate::{Errorspace, APIErrorMeta, APIErrorMetas, Builtin};
@@ -14,7 +14,7 @@ lazy_static! {
     pub static ref ERRORSPACES: RwLock<HashMap<&'static str, Errorspace<'static>>> = RwLock::new(HashMap::new());
 }
 
-#[distributed_slice(INITS)]
+#[distributed_slice(INIT_FNS)]
 pub(crate) fn init() {
     new_errorspace(GLOBAL_ERRORSPACE_NAME);
     register_api_error_metas::<Builtin>();

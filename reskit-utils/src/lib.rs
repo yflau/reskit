@@ -6,7 +6,7 @@ shadow!(build);
 mod macros;
 mod init;
 
-pub use init::{INITS, init_once};
+pub use init::{INIT_FNS, init_once};
 
 #[cfg(test)]
 mod tests {

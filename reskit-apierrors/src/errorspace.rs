@@ -39,9 +39,14 @@ impl<'a> Errorspace<'a> {
     }
 
     /// adapt adapts anyhow::Error to specify error space, or wrap it with default_meta as a APIError
-    pub fn adapt(&self, err: anyhow::Error, default_meta: &'static dyn APIErrorMeta, _mapping_names: &[&str])
+    pub fn adapt(&self, 
+        err: anyhow::Error, 
+        default_meta: &'static dyn APIErrorMeta, 
+        //kwargs: HashMap<&'static &str, &'static &str>,
+        mapping_names: &[&str])
         -> APIError<'a>
     {
+        dbg!(mapping_names);
         let api_err: APIError;
         if let Some(ae) = err.downcast_ref::<APIError>() {
             let meta = self.get_api_error_meta(ae.system(), ae.code());
@@ -62,9 +67,13 @@ impl<'a> Errorspace<'a> {
     }
 
     /// force wraps the anyhow::Error with given meta as a APIError
-    pub fn force(&self, err: anyhow::Error, meta: &'a dyn APIErrorMeta, _mapping_names: &[&str])
+    pub fn force(&self, 
+        err: anyhow::Error, 
+        meta: &'a dyn APIErrorMeta,
+        mapping_names: &[&str])
         -> APIError<'a>
     {
+        dbg!(mapping_names);
         APIError {
             meta,
             error: err,

@@ -49,14 +49,14 @@ macro_rules! fn_name {
 mod tests {
     #[test]
     fn macros_test() {
-        assert_eq!(caller!(), "reskit_utils::macros::test::macros_test");
-        assert_eq!(caller!(4), "reskit_utils::macros::test::macros_test");
+        assert_eq!(caller!(), "reskit_utils::macros::tests::macros_test");
+        assert_eq!(caller!(4), "reskit_utils::macros::tests::macros_test");
         assert_eq!(fn_name!(), "macros_test");
         fn inner() {
-            assert_eq!(caller!(), "reskit_utils::macros::test::macros_test::inner");
-            assert_eq!(caller!(1), "reskit_utils::macros::test::macros_test");
+            assert_eq!(caller!(), "reskit_utils::macros::tests::macros_test::inner");
+            assert_eq!(caller!(1), "reskit_utils::macros::tests::macros_test");
         }
         inner();
-        assert_eq!(caller!(5), "reskit_utils::macros::test::macros_test");
+        assert_eq!(caller!(5), "reskit_utils::macros::tests::macros_test");
     }
 }
