@@ -4,7 +4,6 @@ use std::collections::HashMap;
 
 use http_types::StatusCode;
 use strum::IntoEnumIterator;
-use anyhow;
 
 use crate::PVLost;
 
@@ -31,7 +30,7 @@ pub struct APIError<'a> {
 
 impl<'a> Display for APIError<'a> {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        std::fmt::Display::fmt(&self.meta, f) // FIXME: 需要结合meta和error！
+        write!(f, "{}->{}", self.meta, self.error)
     }
 }
 
@@ -86,7 +85,7 @@ impl APIErrorClass {
             system: system.to_string(),
             code: code.to_string(),
             message: msg.to_string(),
-            status: status,
+            status,
             pvlost: PVLost::LocalError,
         }
     }

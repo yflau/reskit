@@ -152,8 +152,8 @@ mod tests {
         match result {
             Err(err)=>{
                 assert_eq!(format!("{}", err.root_cause()), "demo error");
-                assert_eq!(format!("{}", err), "500::1:Unexpected error.:2"); // FIXME: 需要类似Debug的调用链表示
-                assert_eq!(format!("{:?}", err), "500::1:Unexpected error.:2\n\nCaused by:\n    demo error");
+                assert_eq!(format!("{}", err), "500::1:Unexpected error.:2->500::1:Unexpected error.:2->first"); // FIXME: 需要类似Debug的调用链表示
+                assert_eq!(format!("{:?}", err), "500::1:Unexpected error.:2->500::1:Unexpected error.:2->first\n\nCaused by:\n    demo error");
             },
             _ => {},
         }
@@ -164,9 +164,9 @@ mod tests {
             .context("post");
         match result {
             Err(err)=>{
-                //assert_eq!(format!("{}", err.root_cause()), "demo error");
-                //assert_eq!(format!("{}", err), "500::1:Unexpected error.:2"); // FIXME: 需要类似Debug的调用链表示
-                assert_eq!(format!("{:?}", err), "post\n\nCaused by:\n    0: 500::1:Unexpected error.:2\n    1: demo error");
+                assert_eq!(format!("{}", err.root_cause()), "demo error");
+                assert_eq!(format!("{}", err), "post"); // FIXME: 需要类似Debug的调用链表示
+                assert_eq!(format!("{:?}", err), "post\n\nCaused by:\n    0: 500::1:Unexpected error.:2->pre\n    1: demo error");
             },
             _ => {},
         }
@@ -183,8 +183,8 @@ mod tests {
         match result {
             Err(err)=>{
                 assert_eq!(format!("{}", err.root_cause()), "demo error");
-                assert_eq!(format!("{}", err), "500::2:Failure.:2"); // FIXME: 需要类似Debug的调用链表示
-                assert_eq!(format!("{:?}", err), "500::2:Failure.:2\n\nCaused by:\n    0: 500::1:Unexpected error.:2\n    1: demo error");
+                assert_eq!(format!("{}", err), "500::2:Failure.:2->second"); // FIXME: 需要类似Debug的调用链表示
+                assert_eq!(format!("{:?}", err), "500::2:Failure.:2->second\n\nCaused by:\n    0: 500::1:Unexpected error.:2->first\n    1: demo error");
             },
             _ => {},
         }
