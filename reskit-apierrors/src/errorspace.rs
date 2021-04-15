@@ -43,9 +43,8 @@ impl<'a> Errorspace<'a> {
         err: anyhow::Error, 
         default_meta: &'static dyn APIErrorMeta, 
         mapping_names: &[&str],
-        caller: Option<&'static str>)
-        -> APIError<'a>
-    {
+        caller: Option<&'static str>,
+    ) -> APIError<'a> {
         let api_err: APIError;
         if let Some(ae) = err.downcast_ref::<APIError>() {
             let meta = self.get_api_error_meta(ae.system(), ae.code());
@@ -72,9 +71,8 @@ impl<'a> Errorspace<'a> {
         err: anyhow::Error, 
         meta: &'a dyn APIErrorMeta,
         mapping_names: &[&str],
-        caller: Option<&'static str>)
-        -> APIError<'a>
-    {
+        caller: Option<&'static str>,
+    ) -> APIError<'a> {
         dbg!(mapping_names);
         APIError {
             meta,

@@ -22,7 +22,11 @@ pub use globals::{
     register_errorspace,
     clone_errorspace,
     register_api_error_metas,
-    overwrite_api_error_metas
+    overwrite_api_error_metas,
+    get_api_error_meta,
+    register_api_error_metas_errorspace,
+    overwrite_api_error_metas_errorspace,
+    get_api_error_meta_errorspace,
 };
 
 #[cfg(feature = "pvlost")]

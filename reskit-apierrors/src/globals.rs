@@ -82,13 +82,14 @@ pub fn get_api_error_meta(system: &str, code: &str) -> Option<&'static dyn APIEr
 }
 
 /// adapt_errorspace adapts anyhow::Error to specify error space, or wrap it with default_meta as a APIError in global error space
+#[allow(dead_code)]
 pub(crate) fn adapt_errorspace(
     name: &str, 
     err: anyhow::Error, 
     default_meta: &'static dyn APIErrorMeta, 
     mapping_names: &[&str],
-    caller: Option<&'static str>) 
-    -> anyhow::Error {
+    caller: Option<&'static str>,
+) -> anyhow::Error {
     let spaces = ERRORSPACES.read().unwrap();
     let space = spaces.get(name).unwrap();
     let api_err = space.adapt(err, default_meta, mapping_names, caller);
@@ -96,13 +97,14 @@ pub(crate) fn adapt_errorspace(
 }
 
 /// force wraps the anyhow::Error with given meta as a APIError in global error space
+#[allow(dead_code)]
 pub(crate) fn force_errorspace(
     name: &str, 
     err: anyhow::Error, 
     meta: &'static dyn APIErrorMeta, 
     mapping_names: &[&str],
-    caller: Option<&'static str>) 
-    -> anyhow::Error {
+    caller: Option<&'static str>,
+) -> anyhow::Error {
     let spaces = ERRORSPACES.read().unwrap();
     let space = spaces.get(name).unwrap();
     let api_err = space.force(err, meta, mapping_names, caller);
