@@ -3,25 +3,30 @@ extern crate shadow_rs;
 
 shadow!(build);
 
-pub mod pvlost;
 pub mod apierror;
 pub mod globals;
 pub mod errorspace;
 pub mod builtin;
 pub mod macros;
 
-pub use pvlost::PVLost;
+#[cfg(feature = "pvlost")]
+pub mod pvlost;
+
 pub use apierror::{APIErrorMeta, APIErrorMetas, APIError, APIErrorMetaEnum};
 pub use errorspace::Errorspace;
 pub use builtin::Builtin;
 pub use globals::{
+    GLOBAL_ERRORSPACE_NAME,
     ERRORSPACES,
     new_errorspace,
     register_errorspace,
     clone_errorspace,
     register_api_error_metas,
-    overwrite_api_error_metas,
-    adapt, force};
+    overwrite_api_error_metas
+};
+
+#[cfg(feature = "pvlost")]
+pub use pvlost::PVLost;
 
 #[cfg(test)]
 mod tests {

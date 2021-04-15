@@ -5,9 +5,8 @@
 ## TODO
 
 - customize Debug & Display
-- errorspace registry: done
-- pvlost feature gate
+- fn result optimization
 - test harness with setup & teardown
-- derive macro & adapt & force macro
+- derive macro
 - mapping
-- extra information
+- document

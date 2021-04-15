@@ -1,8 +1,6 @@
 use std::fmt::{self, Debug, Display};
 use std::convert::TryFrom;
 
-use anyhow;
-
 /// PV Lost code, describe the pv status and use code to identify the lost reason.
 #[repr(u8)]
 #[derive(Copy, Clone, Eq, PartialEq, Hash)]

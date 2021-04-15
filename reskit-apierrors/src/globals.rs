@@ -8,7 +8,7 @@ use anyhow::Result;
 
 use crate::{Errorspace, APIErrorMeta, APIErrorMetas, Builtin};
 
-const GLOBAL_ERRORSPACE_NAME: &str = "";
+pub const GLOBAL_ERRORSPACE_NAME: &str = "";
 
 lazy_static! {
     pub static ref ERRORSPACES: RwLock<HashMap<&'static str, Errorspace<'static>>> = RwLock::new(HashMap::new());
@@ -82,27 +82,31 @@ pub fn get_api_error_meta(system: &str, code: &str) -> Option<&'static dyn APIEr
 }
 
 /// adapt_errorspace adapts anyhow::Error to specify error space, or wrap it with default_meta as a APIError in global error space
-pub fn adapt_errorspace(name: &str, err: anyhow::Error, default_meta: &'static dyn APIErrorMeta, _mapping_names: &[&str]) -> anyhow::Error {
+pub(crate) fn adapt_errorspace(
+    name: &str, 
+    err: anyhow::Error, 
+    default_meta: &'static dyn APIErrorMeta, 
+    mapping_names: &[&str],
+    caller: Option<&'static str>) 
+    -> anyhow::Error {
     let spaces = ERRORSPACES.read().unwrap();
     let space = spaces.get(name).unwrap();
-    let api_err = space.adapt(err, default_meta, _mapping_names);
+    let api_err = space.adapt(err, default_meta, mapping_names, caller);
     anyhow::Error::new(api_err)
-}
-
-pub fn adapt(err: anyhow::Error, default_meta: &'static dyn APIErrorMeta, _mapping_names: &[&str]) -> anyhow::Error {
-    adapt_errorspace(GLOBAL_ERRORSPACE_NAME, err, default_meta, _mapping_names)
 }
 
 /// force wraps the anyhow::Error with given meta as a APIError in global error space
-pub fn force_errorspace(name: &str, err: anyhow::Error, meta: &'static dyn APIErrorMeta, _mapping_names: &[&str]) -> anyhow::Error {
+pub(crate) fn force_errorspace(
+    name: &str, 
+    err: anyhow::Error, 
+    meta: &'static dyn APIErrorMeta, 
+    mapping_names: &[&str],
+    caller: Option<&'static str>) 
+    -> anyhow::Error {
     let spaces = ERRORSPACES.read().unwrap();
     let space = spaces.get(name).unwrap();
-    let api_err = space.force(err, meta, _mapping_names);
+    let api_err = space.force(err, meta, mapping_names, caller);
     anyhow::Error::new(api_err)
-}
-
-pub fn force(err: anyhow::Error, meta: &'static dyn APIErrorMeta, _mapping_names: &[&str]) -> anyhow::Error {
-    force_errorspace(GLOBAL_ERRORSPACE_NAME, err, meta, _mapping_names)
 }
 
 #[cfg(test)]

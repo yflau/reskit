@@ -39,45 +39,47 @@ impl<'a> Errorspace<'a> {
     }
 
     /// adapt adapts anyhow::Error to specify error space, or wrap it with default_meta as a APIError
-    pub fn adapt(&self, 
+    pub(crate) fn adapt(&self, 
         err: anyhow::Error, 
         default_meta: &'static dyn APIErrorMeta, 
-        //kwargs: HashMap<&'static &str, &'static &str>,
-        mapping_names: &[&str])
+        mapping_names: &[&str],
+        caller: Option<&'static str>)
         -> APIError<'a>
     {
-        dbg!(mapping_names);
         let api_err: APIError;
         if let Some(ae) = err.downcast_ref::<APIError>() {
             let meta = self.get_api_error_meta(ae.system(), ae.code());
             api_err = APIError {
                 meta: meta.unwrap(),
                 error: err,
-                extra: None,
+                caller,
             }
         } else {
+            // FIXME: do we need verbose gate here?
             api_err = APIError {
                 meta: default_meta,
                 error: err,
-                extra: None,
+                caller,
             }
         }
         // TODO: map to other error spaces
+        dbg!(mapping_names);
         api_err
     }
 
     /// force wraps the anyhow::Error with given meta as a APIError
-    pub fn force(&self, 
+    pub(crate) fn force(&self, 
         err: anyhow::Error, 
         meta: &'a dyn APIErrorMeta,
-        mapping_names: &[&str])
+        mapping_names: &[&str],
+        caller: Option<&'static str>)
         -> APIError<'a>
     {
         dbg!(mapping_names);
         APIError {
             meta,
             error: err,
-            extra: None,
+            caller,
         }
     }
 
@@ -147,26 +149,26 @@ mod tests {
         init_once();
         let result = demo()
             .context("first")
-            .map_err(|e| adapt(e, &Builtin::Unknown, &[]))
-            .map_err(|e| adapt(e, &Builtin::Internal, &[]));
+            .map_err(|e| adapt!(e, &Builtin::Unknown))
+            .map_err(|e| adapt!(e, &Builtin::Internal));
         match result {
             Err(err)=>{
                 assert_eq!(format!("{}", err.root_cause()), "demo error");
-                assert_eq!(format!("{}", err), "500::1:Unexpected error.:2->500::1:Unexpected error.:2->first"); // FIXME: 需要类似Debug的调用链表示
-                assert_eq!(format!("{:?}", err), "500::1:Unexpected error.:2->500::1:Unexpected error.:2->first\n\nCaused by:\n    demo error");
+                assert_eq!(format!("{}", err), "500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->first"); // NOTE: do not use display, use debug instead
+                assert_eq!(format!("{:?}", err), "500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->first\n\nCaused by:\n    demo error");
             },
             _ => {},
         }
 
         let result = demo()
             .context("pre")
-            .map_err(|e| adapt(e, &Builtin::Unknown, &[]))
+            .map_err(|e| adapt!(e, &Builtin::Unknown))
             .context("post");
         match result {
             Err(err)=>{
                 assert_eq!(format!("{}", err.root_cause()), "demo error");
-                assert_eq!(format!("{}", err), "post"); // FIXME: 需要类似Debug的调用链表示
-                assert_eq!(format!("{:?}", err), "post\n\nCaused by:\n    0: 500::1:Unexpected error.:2->pre\n    1: demo error");
+                assert_eq!(format!("{}", err), "post"); // NOTE: do not use display, use debug instead
+                assert_eq!(format!("{:?}", err), "post\n\nCaused by:\n    0: 500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->pre\n    1: demo error");
             },
             _ => {},
         }
@@ -177,14 +179,14 @@ mod tests {
         init_once();
         let result = demo()
             .context("first")
-            .map_err(|e| adapt(e, &Builtin::Unknown, &[]))
+            .map_err(|e| adapt!(e, &Builtin::Unknown))
             .context("second")
-            .map_err(|e| force(e, &Builtin::Internal, &[]));
+            .map_err(|e| force!(e, &Builtin::Internal));
         match result {
             Err(err)=>{
                 assert_eq!(format!("{}", err.root_cause()), "demo error");
-                assert_eq!(format!("{}", err), "500::2:Failure.:2->second"); // FIXME: 需要类似Debug的调用链表示
-                assert_eq!(format!("{:?}", err), "500::2:Failure.:2->second\n\nCaused by:\n    0: 500::1:Unexpected error.:2->first\n    1: demo error");
+                assert_eq!(format!("{}", err), "500::2:Failure.:reskit_apierrors::errorspace::tests::test_force::{{closure}}->second"); // NOTE: do not use display, use debug instead
+                assert_eq!(format!("{:?}", err), "500::2:Failure.:reskit_apierrors::errorspace::tests::test_force::{{closure}}->second\n\nCaused by:\n    0: 500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_force::{{closure}}->first\n    1: demo error");
             },
             _ => {},
         }

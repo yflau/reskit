@@ -3,7 +3,11 @@ use std::fmt::{Display, Result, Formatter, Debug};
 use http_types::StatusCode;
 use strum_macros::{EnumCount, EnumIter, EnumString};
 
-use crate::{APIErrorMeta, APIErrorMetas, APIErrorMetaEnum, PVLost};
+use crate::{APIErrorMeta, APIErrorMetas, APIErrorMetaEnum};
+
+#[cfg(feature = "pvlost")]
+use crate::PVLost;
+
 
 /// Builtin defines the builtin api error metas
 #[derive(Clone, Copy, Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: impl APIErrorMetaEnum derive macro！
@@ -296,7 +300,14 @@ pub enum Builtin {
     DataLoss,
 }
 
+#[cfg(not(feature = "pvlost"))]
+impl Display for Builtin {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        write!(f, "{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message())
+    }
+}
 
+#[cfg(feature = "pvlost")]
 impl Display for Builtin {
     fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "{}:{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message(), self.pvlost() as u8)
@@ -340,6 +351,7 @@ impl APIErrorMeta for Builtin { // FIXME: derive
         }
     }
 
+    #[cfg(feature = "pvlost")]
     fn pvlost(&self) -> PVLost {
         match self {
             Self::Successful => PVLost::Successful,
