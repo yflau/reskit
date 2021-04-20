@@ -3,7 +3,7 @@ use std::fmt::{Display, Result, Formatter, Debug};
 use http_types::StatusCode;
 use strum_macros::{EnumCount, EnumIter, EnumString};
 
-use crate::{APIErrorMeta, APIErrorMetas, APIErrorMetaEnum};
+use crate::{APIErrorMeta, APIErrorMetas, APIErrorMetaEnum, AsAPIErrorMeta};
 
 #[cfg(feature = "pvlost")]
 use crate::PVLost;
@@ -22,7 +22,7 @@ pub enum Builtin {
     Description:
     Not an error; returned on success
     */
-    // TODO: #[apierrormeta(system="", code="0", message="Successful.", status_code=200, pvlost=0)]
+    //#[apierrormeta(system="", code="0", message="Successful.", status_code=200, pvlost=0)]
     Successful,
 
     /**
@@ -39,7 +39,7 @@ pub enum Builtin {
     errors raised by APIs that do not return enough error information
     may be converted to this error.
     */
-    // TODO: #[apierrormeta(system="", code="1", message="Unknown error.", status_code=500)]
+    //#[apierrormeta(system="", code="1", message="Unknown error.", status_code=500)]
     Unknown,
 
     /**
@@ -55,7 +55,7 @@ pub enum Builtin {
     underlying system have been broken.  This error code is reserved
     for serious errors.
     */
-    // TODO: #[apierrormeta(system="", code="2", message="Internal server error.", status_code=500)]
+    //#[apierrormeta(system="", code="2", message="Internal server error.", status_code=500)]
     Internal,
 
     /**
@@ -72,7 +72,7 @@ pub enum Builtin {
     that are problematic regardless of the state of the system
     (e.g., a malformed file name).
     */
-    // TODO: #[apierrormeta(system="", code="3", message="Invalid argument.", status_code=400)]
+    //#[apierrormeta(system="", code="3", message="Invalid argument.", status_code=400)]
     InvalidArgument,
 
     /**
@@ -85,7 +85,7 @@ pub enum Builtin {
     The request does not have valid authentication credentials for the
     operation.
     */
-    // TODO: #[apierrormeta(system="", code="4", message="Authentication failed.", status_code=401)]
+    //#[apierrormeta(system="", code="4", message="Authentication failed.", status_code=401)]
     Unauthorized,
 
     /**
@@ -98,7 +98,7 @@ pub enum Builtin {
     The operation is not implemented or is not supported/enabled in this
     service.
     */
-    // TODO: #[apierrormeta(system="", code="6", message="Not Implemented.", status_code=501)]
+    //#[apierrormeta(system="", code="6", message="Not Implemented.", status_code=501)]
     NotImplemented,
 
     /**
@@ -114,7 +114,7 @@ pub enum Builtin {
     a class of users, such as user-based access control, `PERMISSION_DENIED`
     must be used.
     */
-    // TODO: #[apierrormeta(system="", code="7", message="Not found.", status_code=404)]
+    //#[apierrormeta(system="", code="7", message="Not found.", status_code=404)]
     NotFound,
 
     /**
@@ -133,7 +133,7 @@ pub enum Builtin {
     request is valid or the requested entity exists or satisfies
     other pre-conditions.
     */
-    // TODO: #[apierrormeta(system="", code="13", message="Permission Denied.", status_code=403)]
+    //#[apierrormeta(system="", code="13", message="Permission Denied.", status_code=403)]
     PermissionDenied,
 
 
@@ -143,7 +143,7 @@ pub enum Builtin {
     Mapping:
     - http status code: 500 Internal Server Error
     */
-    // TODO: #[apierrormeta(system="", code="13", message="Data source request failure.", status_code=500, pvlost=1)]
+    //#[apierrormeta(system="", code="13", message="Data source request failure.", status_code=500, pvlost=1)]
     DataSourceFailure,
 
     /**
@@ -156,7 +156,7 @@ pub enum Builtin {
     Some resource has been exhausted, perhaps a per-user quota, or
     perhaps the entire file system is out of space.
     */
-    // TODO: #[apierrormeta(system="", code="16", message="Data source request failure.", status_code=429)]
+    //#[apierrormeta(system="", code="16", message="Data source request failure.", status_code=429)]
     ResourceExhausted,
 
     /**
@@ -183,7 +183,7 @@ pub enum Builtin {
          should be returned since the client should not retry unless
          the files are deleted from the directory.
     */
-    // TODO: #[apierrormeta(system="", code="20", message="Failed precondition, do not retry.", status_code=400)]
+    //#[apierrormeta(system="", code="20", message="Failed precondition, do not retry.", status_code=400)]
     FailedPrecondition,
 
     /**
@@ -209,7 +209,7 @@ pub enum Builtin {
     a space can easily look for an `OUT_OF_RANGE` error to detect when
     they are done.
     */
-    // TODO: #[apierrormeta(system="", code="21", message="Out of range.", status_code=400)]
+    //#[apierrormeta(system="", code="21", message="Out of range.", status_code=400)]
     OutOfRange,
 
     /**
@@ -222,7 +222,7 @@ pub enum Builtin {
     The entity that a client attempted to create (e.g., file or directory)
     already exists.
     */
-    // TODO: #[apierrormeta(system="", code="22", message="Already exists.", status_code=409)]
+    //#[apierrormeta(system="", code="22", message="Already exists.", status_code=409)]
     AlreadyExists,
 
     /**
@@ -238,7 +238,7 @@ pub enum Builtin {
     See the guidelines above for deciding between `FAILED_PRECONDITION`,
     `ABORTED`, and `UNAVAILABLE`.
     */
-    // TODO: #[apierrormeta(system="", code="23", message="Aborted, retry whole transaction.", status_code=409)]
+    //#[apierrormeta(system="", code="23", message="Aborted, retry whole transaction.", status_code=409)]
     Aborted,
 
     /**
@@ -250,7 +250,7 @@ pub enum Builtin {
 
     The operation was cancelled, typically by the caller.
     */
-    // TODO: #[apierrormeta(system="", code="24", message="Request cancelled by client.", status_code=499)]
+    //#[apierrormeta(system="", code="24", message="Request cancelled by client.", status_code=400)] // FIXME: 499
     Cancelled,
 
     /**
@@ -266,7 +266,7 @@ pub enum Builtin {
     successful response from a server could have been delayed long
     enough for the deadline to expire.
     */
-    // TODO: #[apierrormeta(system="", code="25", message="Timeout.", status_code=504, pvlost=1)]
+    //#[apierrormeta(system="", code="25", message="Timeout.", status_code=504, pvlost=1)]
     DeadlineExceeded,
 
     /**
@@ -284,7 +284,7 @@ pub enum Builtin {
     See the guidelines above for deciding between `FAILED_PRECONDITION`,
     `ABORTED`, and `UNAVAILABLE`.
     */
-    // TODO: #[apierrormeta(system="", code="26", message="Service unavailable.", status_code=503, pvlost=1)]
+    //#[apierrormeta(system="", code="26", message="Service unavailable.", status_code=503, pvlost=1)]
     Unavailable,
 
     /**
@@ -296,80 +296,78 @@ pub enum Builtin {
 
     Unrecoverable data loss or corruption.
     */
-    // TODO: #[apierrormeta(system="", code="27", message="Data loss.", status_code=503)]
+    //#[apierrormeta(system="", code="27", message="Data loss.", status_code=503)]
     DataLoss,
 }
 
-#[cfg(not(feature = "pvlost"))]
-impl Display for Builtin {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message())
-    }
-}
+// impl APIErrorMeta for Builtin { // FIXME: derive
+//     fn system(&self) -> &str {
+//         match self {
+//             Self::Successful => "",
+//             Self::Unknown => "",
+//             Self::Internal => "",
+//             _ => "",
+//         }
+//     }
 
-#[cfg(feature = "pvlost")]
-impl Display for Builtin {
-    fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "{}:{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message(), self.pvlost() as u8)
-    }
-}
+//     fn code(&self) -> &str {
+//         match self {
+//             Self::Successful => "0",
+//             Self::Unknown => "1",
+//             Self::Internal => "2",
+//             _ => "",
+//         }
+//     }
 
-impl APIErrorMeta for Builtin { // FIXME: derive
-    fn system(&self) -> &str {
-        match self {
-            Self::Successful => "",
-            Self::Unknown => "",
-            Self::Internal => "",
-            _ => "",
-        }
-    }
+//     fn message(&self) -> &str {
+//         match self {
+//             Self::Successful => "Successful.",
+//             Self::Unknown => "Unexpected error.",
+//             Self::Internal => "Failure.",
+//             _ => "",
+//         }
+//     }
 
-    fn code(&self) -> &str {
-        match self {
-            Self::Successful => "0",
-            Self::Unknown => "1",
-            Self::Internal => "2",
-            _ => "",
-        }
-    }
+//     fn status_code(&self) -> StatusCode {
+//         match self {
+//             Self::Successful => StatusCode::Ok,
+//             Self::Unknown => StatusCode::InternalServerError,
+//             Self::Internal => StatusCode::InternalServerError,
+//             _ => StatusCode::InternalServerError,
+//         }
+//     }
 
-    fn message(&self) -> &str {
-        match self {
-            Self::Successful => "Successful.",
-            Self::Unknown => "Unexpected error.",
-            Self::Internal => "Failure.",
-            _ => "",
-        }
-    }
+//     #[cfg(feature = "pvlost")]
+//     fn pvlost(&self) -> PVLost {
+//         match self {
+//             Self::Successful => PVLost::Successful,
+//             Self::DataSourceFailure => PVLost::RemoteError,
+//             _ => PVLost::LocalError,
+//         }
+//     }
+// }
 
-    fn status_code(&self) -> StatusCode {
-        match self {
-            Self::Successful => StatusCode::Ok,
-            Self::Unknown => StatusCode::InternalServerError,
-            Self::Internal => StatusCode::InternalServerError,
-            _ => StatusCode::InternalServerError,
-        }
-    }
+// impl APIErrorMetas for Builtin { // FIXME: derive
+//     fn api_error_metas() -> Vec<&'static dyn APIErrorMeta> {
+//         vec![
+//             &Self::Successful,
+//             &Self::Unknown,
+//             &Self::Internal,
+//         ]
+//     }
+// }
 
-    #[cfg(feature = "pvlost")]
-    fn pvlost(&self) -> PVLost {
-        match self {
-            Self::Successful => PVLost::Successful,
-            Self::DataSourceFailure => PVLost::RemoteError,
-            _ => PVLost::LocalError,
-        }
-    }
-}
+// impl Display for Builtin {
+//     #[cfg(not(feature = "pvlost"))]
+//     fn fmt(&self, f: &mut Formatter) -> Result {
+//         write!(f, "{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message())  
+//     }
 
-impl APIErrorMetas for Builtin { // FIXME: derive
-    fn api_error_metas() -> Vec<&'static dyn APIErrorMeta> {
-        vec![
-            &Self::Successful,
-            &Self::Unknown,
-            &Self::Internal,
-        ]
-    }
-}
+//     #[cfg(feature = "pvlost")]
+//     fn fmt(&self, f: &mut Formatter) -> Result {
+//         write!(f, "{}:{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message(), self.pvlost() as u8)
+//     }
+// }
 
 impl APIErrorMetaEnum for Builtin {} // FIXME: do we need this?
 

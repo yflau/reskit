@@ -13,6 +13,7 @@ members = [
   ".",
   "reskit-utils",
   "reskit-apierrors",
+  "reskit-apierrors-derive",
   "reskit-registry",
   "reskit-renderer",
   "reskit-log",

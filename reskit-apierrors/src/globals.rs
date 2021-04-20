@@ -4,7 +4,6 @@ use std::collections::HashMap;
 use lazy_static::lazy_static;
 use linkme::distributed_slice;
 use reskit_utils::INIT_FNS;
-use anyhow::Result;
 
 use crate::{Errorspace, APIErrorMeta, APIErrorMetas, Builtin};
 
@@ -31,7 +30,7 @@ pub fn register_errorspace(name: &'static str, space: Errorspace<'static>) {
 }
 
 /// clone_errorspace clone errorspace
-pub fn clone_errorspace(from: &'static str, to: &'static str) -> Result<()>{
+pub fn clone_errorspace(from: &'static str, to: &'static str) -> anyhow::Result<()>{
     let mut spaces = ERRORSPACES.write().unwrap();
     match spaces.get(from) {
         None => Err(anyhow::anyhow!("errorspace {} not found", from)),

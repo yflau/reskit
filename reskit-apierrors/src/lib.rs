@@ -32,6 +32,8 @@ pub use globals::{
 #[cfg(feature = "pvlost")]
 pub use pvlost::PVLost;
 
+pub use reskit_apierrors_derive::*;
+
 #[cfg(test)]
 mod tests {
     #[test]

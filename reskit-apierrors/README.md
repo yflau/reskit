@@ -10,3 +10,5 @@
 - derive macro
 - mapping
 - document
+- add extension support
+- static dispatch with enum_dispatch

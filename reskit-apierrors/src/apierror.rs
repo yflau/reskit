@@ -25,9 +25,12 @@ pub trait APIErrorMetaEnum: IntoEnumIterator + APIErrorMeta{} // FIXME: do we ne
 
 #[derive(Debug)]
 pub struct APIError<'a> {
-    pub meta: &'a dyn APIErrorMeta,
+    pub meta: &'a dyn APIErrorMeta, // TODO: static dispatch with enum_dispatch!
     pub error: anyhow::Error,
     pub caller: Option<&'static str>,
+
+    // #[serde(skip_serializing_if = "extensions_is_empty")]
+    // pub extensions: Option<Map<String, Value>>, // TODO: add extension support
 }
 
 impl<'a> Display for APIError<'a> {
