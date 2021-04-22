@@ -93,29 +93,36 @@ mod tests {
     use http_types::StatusCode;
     use reskit_utils::init_once;
     use anyhow::{anyhow, Result, Context};
-    use crate::{ERRORSPACES, Builtin, adapt, force};
-    use crate::apierror::APIErrorClass; // FIXME
+    use crate::{ERRORSPACES, Builtin, adapt, force, AsAPIErrorMeta, prelude::*};
 
-    // FIXME: 完成apierrors_derive后修复此测试！
-    // #[test]
-    // fn test_errorspace() {
-    //     init_once();
-    //     let class: APIErrorClass = APIErrorClass::new("dummy", "1", "dummy error", StatusCode::InternalServerError);
-    //     let mut spaces = ERRORSPACES.write().unwrap();
-    //     let space = spaces.get_mut("").unwrap();
-    //     space.register_api_error_meta(&class);
-    //     assert_eq!(space.get_api_error_meta("", "1").unwrap().code(), "1");
-    //     assert_eq!(space.get_api_error_meta("dummy", "1").unwrap().message(), "dummy error");
-    //     assert!(matches!(space.get_api_error_meta("dummy", "1").unwrap().status_code(), StatusCode::InternalServerError));
-    //     let rebind_class = APIErrorClass::new("dummy", "1", "dummy error", StatusCode::Ok);
-    //     space.register_api_error_meta(&rebind_class);
-    //     assert_eq!(space.get_api_error_meta("dummy", "1").unwrap().message(), "dummy error");
-    //     assert!(matches!(space.get_api_error_meta("dummy", "1").unwrap().status_code(), StatusCode::InternalServerError));
-    //     let rebind_class2 = APIErrorClass::new("dummy", "1", "dummy error", StatusCode::Ok);
-    //     space.overwrite_api_error_meta(&rebind_class2);
-    //     assert_eq!(space.get_api_error_meta("dummy", "1").unwrap().message(), "dummy error");
-    //     assert!(matches!(space.get_api_error_meta("dummy", "1").unwrap().status_code(), StatusCode::Ok));   
-    // }
+    #[derive(Clone, Copy, Debug, PartialEq, AsAPIErrorMeta)]
+    enum Test {
+        #[apierrormeta(system="dummy", code="1", message="dummy error", status_code=500)]
+        Dummy,
+        #[apierrormeta(system="dummy", code="1", message="dummy error", status_code=200)]
+        Rebind,
+        #[apierrormeta(system="dummy", code="1", message="dummy error", status_code=200)]
+        Rebind2,
+        #[apierrormeta(system="dummy_clone", code="1", message="dummy error", status_code=500)]
+        DummyClone,
+    }
+
+    #[test]
+    fn test_errorspace() {
+        init_once();
+        let mut spaces = ERRORSPACES.write().unwrap();
+        let space = spaces.get_mut("").unwrap();
+        space.register_api_error_meta(&Test::Dummy);
+        assert_eq!(space.get_api_error_meta("", "1").unwrap().code(), "1");
+        assert_eq!(space.get_api_error_meta("dummy", "1").unwrap().message(), "dummy error");
+        assert!(matches!(space.get_api_error_meta("dummy", "1").unwrap().status_code(), StatusCode::InternalServerError));
+        space.register_api_error_meta(&Test::Rebind);
+        assert_eq!(space.get_api_error_meta("dummy", "1").unwrap().message(), "dummy error");
+        assert!(matches!(space.get_api_error_meta("dummy", "1").unwrap().status_code(), StatusCode::InternalServerError));
+        space.overwrite_api_error_meta(&Test::Rebind2);
+        assert_eq!(space.get_api_error_meta("dummy", "1").unwrap().message(), "dummy error");
+        assert!(matches!(space.get_api_error_meta("dummy", "1").unwrap().status_code(), StatusCode::Ok));   
+    }
 
     #[test]
     fn test_clone() {
@@ -124,8 +131,7 @@ mod tests {
         let space = spaces.get_mut("").unwrap();
         let mut space_clone = space.clone();
         assert_eq!(space_clone.get_api_error_meta("", "1").unwrap().code(), "1");
-        let class = APIErrorClass::new("dummy_clone", "1", "dummy error", StatusCode::InternalServerError);
-        space_clone.register_api_error_meta(&class);
+        space_clone.register_api_error_meta(&Test::DummyClone);
         assert_eq!(space.len("dummy_clone"), 0);
         assert_eq!(space_clone.len("dummy_clone"), 1);
         assert_eq!(space_clone.get_api_error_meta("dummy_clone", "1").unwrap().message(), "dummy error");

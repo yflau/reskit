@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use crate::{AsAPIErrorMeta, APIErrorMeta};
 
 /// Builtin defines the builtin api error metas
-#[derive(Clone, Copy, Debug, PartialEq, AsAPIErrorMeta)] // TODO: impl APIErrorMetaEnum derive macro！
+#[derive(Clone, Copy, Debug, PartialEq, AsAPIErrorMeta)]
 pub enum Builtin {
     /**
     Successful 请求成功
@@ -292,72 +292,6 @@ pub enum Builtin {
     #[apierrormeta(system="", code="27", message="Data loss.", status_code=503)]
     DataLoss,
 }
-
-// impl APIErrorMeta for Builtin { // FIXME: derive
-//     fn system(&self) -> &str {
-//         match self {
-//             Self::Successful => "",
-//             Self::Unknown => "",
-//             Self::Internal => "",
-//         }
-//     }
-
-//     fn code(&self) -> &str {
-//         match self {
-//             Self::Successful => "0",
-//             Self::Unknown => "1",
-//             Self::Internal => "2",
-//         }
-//     }
-
-//     fn message(&self) -> &str {
-//         match self {
-//             Self::Successful => "Successful.",
-//             Self::Unknown => "Unknown error.",
-//             Self::Internal => "Failure.",
-//         }
-//     }
-
-//     fn status_code(&self) -> StatusCode {
-//         match self {
-//             Self::Successful => StatusCode::Ok,
-//             Self::Unknown => StatusCode::InternalServerError,
-//             Self::Internal => StatusCode::InternalServerError,
-//         }
-//     }
-
-//     #[cfg(feature = "pvlost")]
-//     fn pvlost(&self) -> PVLost {
-//         match self {
-//             Self::Successful => PVLost::Successful,
-//             //Self::DataSourceFailure => PVLost::RemoteError,
-//             _ => PVLost::LocalError,
-//         }
-//     }
-// }
-
-// impl APIErrorMetas for Builtin { // FIXME: derive
-//     fn api_error_metas() -> Vec<&'static dyn APIErrorMeta> {
-//         vec![
-//             &Self::Successful,
-//             &Self::Unknown,
-//             &Self::Internal,
-//         ]
-//     }
-// }
-
-// impl Display for Builtin {
-//     #[cfg(not(feature = "pvlost"))]
-//     fn fmt(&self, f: &mut Formatter) -> Result {
-//         write!(f, "{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message())  
-//     }
-
-//     #[cfg(feature = "pvlost")]
-//     fn fmt(&self, f: &mut Formatter) -> Result {
-//         write!(f, "{}:{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message(), self.pvlost() as u8)
-//     }
-// }
-
 
 #[cfg(test)]
 mod tests {
