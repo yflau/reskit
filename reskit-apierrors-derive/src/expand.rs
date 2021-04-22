@@ -88,7 +88,7 @@ fn impl_enum(input: Enum) -> TokenStream {
                     let ident = &variant.ident;
                     let status_code = &meta.status_code;
                     Some(quote! {
-                        #ty::#ident => http_types::StatusCode::try_form(#status_code).unwrap(),
+                        #ty::#ident => http_types::StatusCode::try_from(#status_code).unwrap(),
                     })
                 }
                 None => None,
@@ -114,15 +114,14 @@ fn impl_enum(input: Enum) -> TokenStream {
                     let ident = &variant.ident;
                     let pvlost = &meta.pvlost;
                     Some(quote! {
-                        #ty::#ident => reskit_apierrors::pvlost::PVLost::try_from(#pvlost).unwrap(),
+                        #ty::#ident => crate::PVLost::try_from(#pvlost).unwrap(),
                     })
                 }
                 _ => None,
             }
         });
         Some(quote! {
-            #[cfg(feature = "pvlost")]
-            fn pvlost(&self) -> reskit_apierrors::pvlost::PVLost {
+            fn pvlost(&self) -> crate::PVLost {
                 match self {
                     #(#arms)*
                 }
@@ -139,8 +138,8 @@ fn impl_enum(input: Enum) -> TokenStream {
         });
         Some(quote! {
             #[allow(unused_qualifications)]
-            impl #impl_generics reskit_apierrors::apierror::APIErrorMetas for #ty #ty_generics #where_clause {
-                fn api_error_metas() -> Vec<&'static dyn reskit_apierrors::apierror::APIErrorMeta> {
+            impl #impl_generics crate::APIErrorMetas for #ty #ty_generics #where_clause {
+                fn api_error_metas() -> Vec<&'static dyn crate::APIErrorMeta> {
                     vec![
                         #(#arms)*
                     ]
@@ -149,17 +148,24 @@ fn impl_enum(input: Enum) -> TokenStream {
         })
     };
 
+    #[cfg(not(feature = "pvlost"))]
     let display_impl =  {
         Some(quote! {
             #[allow(unused_qualifications)]
             impl #impl_generics std::fmt::Display for #ty #ty_generics #where_clause {
-                #[cfg(not(feature = "pvlost"))]
-                fn fmt(&self, f: &mut std::fmt::Formatter) -> Result {
+                fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
                     write!(f, "{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message())  
                 }
-            
-                #[cfg(feature = "pvlost")]
-                fn fmt(&self, f: &mut std::fmt::Formatter) -> Result {
+            }
+        })
+    };
+
+    #[cfg(feature = "pvlost")]
+    let display_impl =  {
+        Some(quote! {
+            #[allow(unused_qualifications)]
+            impl #impl_generics std::fmt::Display for #ty #ty_generics #where_clause {
+                fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
                     write!(f, "{}:{}:{}:{}:{}", self.status_code(), self.system(), self.code(), self.message(), self.pvlost() as u8)
                 }
             }
@@ -167,8 +173,9 @@ fn impl_enum(input: Enum) -> TokenStream {
     };
 
     quote! {
+        use std::convert::TryFrom;
         #[allow(unused_qualifications)]
-        impl #impl_generics APIErrorMeta for #ty #ty_generics #where_clause {
+        impl #impl_generics crate::APIErrorMeta for #ty #ty_generics #where_clause {
             #system_method
             #code_method
             #message_method

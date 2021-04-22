@@ -1,16 +1,9 @@
-use std::fmt::{Display, Result, Formatter, Debug};
+use std::fmt::Debug;
 
-use http_types::StatusCode;
-use strum_macros::{EnumCount, EnumIter, EnumString};
-
-use crate::{APIErrorMeta, APIErrorMetas, APIErrorMetaEnum, AsAPIErrorMeta};
-
-#[cfg(feature = "pvlost")]
-use crate::PVLost;
-
+use crate::{AsAPIErrorMeta, APIErrorMeta};
 
 /// Builtin defines the builtin api error metas
-#[derive(Clone, Copy, Debug, PartialEq, EnumCount, EnumIter, EnumString)] // TODO: impl APIErrorMetaEnum derive macro！
+#[derive(Clone, Copy, Debug, PartialEq, AsAPIErrorMeta)] // TODO: impl APIErrorMetaEnum derive macro！
 pub enum Builtin {
     /**
     Successful 请求成功
@@ -22,7 +15,7 @@ pub enum Builtin {
     Description:
     Not an error; returned on success
     */
-    //#[apierrormeta(system="", code="0", message="Successful.", status_code=200, pvlost=0)]
+    #[apierrormeta(system="", code="0", message="Successful.", status_code=200, pvlost=0)]
     Successful,
 
     /**
@@ -39,24 +32,10 @@ pub enum Builtin {
     errors raised by APIs that do not return enough error information
     may be converted to this error.
     */
-    //#[apierrormeta(system="", code="1", message="Unknown error.", status_code=500)]
+    #[apierrormeta(system="", code="1", message="Unknown error.", status_code=500)]
     Unknown,
 
-    /**
-    Internal 未知的服务端错误，通常是服务端bug
 
-    Mapping:
-    - google api style guide: `google.rpc.Code.INTERNAL`
-    - http status code: 500 Internal Server Error
-
-    Internal 服务内部错误。通常是服务端bug.
-    `google.rpc.Code.INTERNAL`
-    Internal errors.  This means that some invariants expected by the
-    underlying system have been broken.  This error code is reserved
-    for serious errors.
-    */
-    //#[apierrormeta(system="", code="2", message="Internal server error.", status_code=500)]
-    Internal,
 
     /**
     InvalidArgument 未知的服务端错误，通常是服务端bug
@@ -73,7 +52,7 @@ pub enum Builtin {
     (e.g., a malformed file name).
     */
     //#[apierrormeta(system="", code="3", message="Invalid argument.", status_code=400)]
-    InvalidArgument,
+    //InvalidArgument,
 
     /**
     Unauthorized 由于缺少，无效或过期的OAuth令牌，请求未通过身份验证
@@ -86,7 +65,7 @@ pub enum Builtin {
     operation.
     */
     //#[apierrormeta(system="", code="4", message="Authentication failed.", status_code=401)]
-    Unauthorized,
+    //Unauthorized,
 
     /**
     NotImplemented API方法未被服务端实现
@@ -99,7 +78,7 @@ pub enum Builtin {
     service.
     */
     //#[apierrormeta(system="", code="6", message="Not Implemented.", status_code=501)]
-    NotImplemented,
+    //NotImplemented,
 
     /**
     NotFound 没有找到指定的资源，或者请求被未公开的原因（例如白名单）拒绝
@@ -115,7 +94,7 @@ pub enum Builtin {
     must be used.
     */
     //#[apierrormeta(system="", code="7", message="Not found.", status_code=404)]
-    NotFound,
+    //NotFound,
 
     /**
     PermissionDenied 客户端没有足够的权限。 发生这种情况的原因可能是OAuth令牌没有正确的作用域，客户端没有权限，或者API尚未为客户端项目启用。
@@ -134,7 +113,7 @@ pub enum Builtin {
     other pre-conditions.
     */
     //#[apierrormeta(system="", code="13", message="Permission Denied.", status_code=403)]
-    PermissionDenied,
+    //PermissionDenied,
 
 
     /**
@@ -144,7 +123,7 @@ pub enum Builtin {
     - http status code: 500 Internal Server Error
     */
     //#[apierrormeta(system="", code="13", message="Data source request failure.", status_code=500, pvlost=1)]
-    DataSourceFailure,
+    //DataSourceFailure,
 
     /**
     ResourceExhausted 资源配额不足或达到速率限制。 客户应该查找google.rpc.QuotaFailure错误详细信息以获取更多信息。
@@ -157,7 +136,7 @@ pub enum Builtin {
     perhaps the entire file system is out of space.
     */
     //#[apierrormeta(system="", code="16", message="Data source request failure.", status_code=429)]
-    ResourceExhausted,
+    //ResourceExhausted,
 
     /**
     FailedPrecondition 请求无法在当前系统状态下执行，例如删除非空目录。
@@ -184,7 +163,7 @@ pub enum Builtin {
          the files are deleted from the directory.
     */
     //#[apierrormeta(system="", code="20", message="Failed precondition, do not retry.", status_code=400)]
-    FailedPrecondition,
+    //FailedPrecondition,
 
     /**
     OutOfRange 客户端指定了一个无效范围。
@@ -210,7 +189,7 @@ pub enum Builtin {
     they are done.
     */
     //#[apierrormeta(system="", code="21", message="Out of range.", status_code=400)]
-    OutOfRange,
+    //OutOfRange,
 
     /**
     AlreadyExists 客户试图创建一个已存在的资源。
@@ -223,7 +202,7 @@ pub enum Builtin {
     already exists.
     */
     //#[apierrormeta(system="", code="22", message="Already exists.", status_code=409)]
-    AlreadyExists,
+    //AlreadyExists,
 
     /**
     Aborted 并发冲突，如读 - 修改 - 写冲突。
@@ -239,7 +218,7 @@ pub enum Builtin {
     `ABORTED`, and `UNAVAILABLE`.
     */
     //#[apierrormeta(system="", code="23", message="Aborted, retry whole transaction.", status_code=409)]
-    Aborted,
+    //Aborted,
 
     /**
     Cancelled 请求被客户端取消
@@ -251,7 +230,7 @@ pub enum Builtin {
     The operation was cancelled, typically by the caller.
     */
     //#[apierrormeta(system="", code="24", message="Request cancelled by client.", status_code=400)] // FIXME: 499
-    Cancelled,
+    //Cancelled,
 
     /**
     DeadlineExceeded 请求超时。
@@ -267,7 +246,7 @@ pub enum Builtin {
     enough for the deadline to expire.
     */
     //#[apierrormeta(system="", code="25", message="Timeout.", status_code=504, pvlost=1)]
-    DeadlineExceeded,
+    //DeadlineExceeded,
 
     /**
     Unavailable 服务不可用。通常是服务端宕机。通常由网关返回
@@ -285,7 +264,7 @@ pub enum Builtin {
     `ABORTED`, and `UNAVAILABLE`.
     */
     //#[apierrormeta(system="", code="26", message="Service unavailable.", status_code=503, pvlost=1)]
-    Unavailable,
+    //Unavailable,
 
     /**
     DataLoss 不可恢复的数据丢失或数据损坏。 客户端应该向用户报告错误。
@@ -297,7 +276,23 @@ pub enum Builtin {
     Unrecoverable data loss or corruption.
     */
     //#[apierrormeta(system="", code="27", message="Data loss.", status_code=503)]
-    DataLoss,
+    //DataLoss,
+
+    /**
+    Internal 未知的服务端错误，通常是服务端bug
+
+    Mapping:
+    - google api style guide: `google.rpc.Code.INTERNAL`
+    - http status code: 500 Internal Server Error
+
+    Internal 服务内部错误。通常是服务端bug.
+    `google.rpc.Code.INTERNAL`
+    Internal errors.  This means that some invariants expected by the
+    underlying system have been broken.  This error code is reserved
+    for serious errors.
+    */
+    #[apierrormeta(system="", code="2", message="Internal server error.", status_code=500)]
+    Internal,
 }
 
 // impl APIErrorMeta for Builtin { // FIXME: derive
@@ -306,7 +301,6 @@ pub enum Builtin {
 //             Self::Successful => "",
 //             Self::Unknown => "",
 //             Self::Internal => "",
-//             _ => "",
 //         }
 //     }
 
@@ -315,16 +309,14 @@ pub enum Builtin {
 //             Self::Successful => "0",
 //             Self::Unknown => "1",
 //             Self::Internal => "2",
-//             _ => "",
 //         }
 //     }
 
 //     fn message(&self) -> &str {
 //         match self {
 //             Self::Successful => "Successful.",
-//             Self::Unknown => "Unexpected error.",
+//             Self::Unknown => "Unknown error.",
 //             Self::Internal => "Failure.",
-//             _ => "",
 //         }
 //     }
 
@@ -333,7 +325,6 @@ pub enum Builtin {
 //             Self::Successful => StatusCode::Ok,
 //             Self::Unknown => StatusCode::InternalServerError,
 //             Self::Internal => StatusCode::InternalServerError,
-//             _ => StatusCode::InternalServerError,
 //         }
 //     }
 
@@ -341,7 +332,7 @@ pub enum Builtin {
 //     fn pvlost(&self) -> PVLost {
 //         match self {
 //             Self::Successful => PVLost::Successful,
-//             Self::DataSourceFailure => PVLost::RemoteError,
+//             //Self::DataSourceFailure => PVLost::RemoteError,
 //             _ => PVLost::LocalError,
 //         }
 //     }
@@ -369,29 +360,15 @@ pub enum Builtin {
 //     }
 // }
 
-impl APIErrorMetaEnum for Builtin {} // FIXME: do we need this?
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-    use strum::{EnumCount, IntoEnumIterator};
     use crate::{Builtin, APIErrorMeta};
 
     #[test]
     fn test_meta() {
         assert_eq!(Builtin::Successful.message(), "Successful.");
-        assert_eq!(Builtin::Unknown.message(), "Unexpected error.");
-    }
-
-    #[test]
-    fn test_iter() {
-        assert_eq!(18, Builtin::COUNT);
-        assert_eq!(Builtin::iter().count(), Builtin::COUNT);
-        assert_eq!(Builtin::Successful, Builtin::from_str("Successful").unwrap());
-        let mut it = Builtin::iter();
-        assert_eq!(Some(Builtin::Successful), it.next());
-        assert_eq!(Some(Builtin::Unknown), it.next());
-        assert_eq!(Some(Builtin::Internal), it.next());
+        assert_eq!(Builtin::Unknown.message(), "Unknown error.");
     }
 
     #[test]

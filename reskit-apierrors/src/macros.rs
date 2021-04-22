@@ -80,35 +80,35 @@ mod tests {
     fn test_adapt_errorspace() {
         init_once();
         let e = adapt_errorspace!("", anyhow::anyhow!("xxx"), &Builtin::Unknown);
-        assert_eq!(format!("{}", e), "500::1:Unexpected error.:reskit_apierrors::macros::tests::test_adapt_errorspace->xxx");
+        assert_eq!(format!("{}", e), "500::1:Unknown error.:reskit_apierrors::macros::tests::test_adapt_errorspace->xxx");
         let e2 = adapt_errorspace!("", anyhow::anyhow!("xxx"), &Builtin::Unknown, "authcar", "rest");
-        assert_eq!(format!("{}", e2), "500::1:Unexpected error.:reskit_apierrors::macros::tests::test_adapt_errorspace->xxx");
+        assert_eq!(format!("{}", e2), "500::1:Unknown error.:reskit_apierrors::macros::tests::test_adapt_errorspace->xxx");
     }
 
     #[test]
     fn test_adapt() {
         init_once();
         let e = adapt!(anyhow::anyhow!("xxx"), &Builtin::Unknown);
-        assert_eq!(format!("{}", e), "500::1:Unexpected error.:reskit_apierrors::macros::tests::test_adapt->xxx");
+        assert_eq!(format!("{}", e), "500::1:Unknown error.:reskit_apierrors::macros::tests::test_adapt->xxx");
         let e2 = adapt!( anyhow::anyhow!("xxx"), &Builtin::Unknown, "authcar", "rest");
-        assert_eq!(format!("{}", e2), "500::1:Unexpected error.:reskit_apierrors::macros::tests::test_adapt->xxx");
+        assert_eq!(format!("{}", e2), "500::1:Unknown error.:reskit_apierrors::macros::tests::test_adapt->xxx");
     }
 
     #[test]
     fn test_force_errorspace() {
         init_once();
         let e = force_errorspace!("", anyhow::anyhow!("xxx"), &Builtin::Unknown);
-        assert_eq!(format!("{}", e), "500::1:Unexpected error.:reskit_apierrors::macros::tests::test_force_errorspace->xxx");
+        assert_eq!(format!("{}", e), "500::1:Unknown error.:reskit_apierrors::macros::tests::test_force_errorspace->xxx");
         let e2 = force_errorspace!("", anyhow::anyhow!("xxx"), &Builtin::Unknown, "authcar", "rest");
-        assert_eq!(format!("{}", e2), "500::1:Unexpected error.:reskit_apierrors::macros::tests::test_force_errorspace->xxx");
+        assert_eq!(format!("{}", e2), "500::1:Unknown error.:reskit_apierrors::macros::tests::test_force_errorspace->xxx");
     }
 
     #[test]
     fn test_force() {
         init_once();
         let e = force!(anyhow::anyhow!("xxx"), &Builtin::Unknown);
-        assert_eq!(format!("{}", e), "500::1:Unexpected error.:reskit_apierrors::macros::tests::test_force->xxx");
+        assert_eq!(format!("{}", e), "500::1:Unknown error.:reskit_apierrors::macros::tests::test_force->xxx");
         let e2 = force!( anyhow::anyhow!("xxx"), &Builtin::Unknown, "authcar", "rest");
-        assert_eq!(format!("{}", e2), "500::1:Unexpected error.:reskit_apierrors::macros::tests::test_force->xxx");
+        assert_eq!(format!("{}", e2), "500::1:Unknown error.:reskit_apierrors::macros::tests::test_force->xxx");
     }
 }

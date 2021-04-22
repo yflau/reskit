@@ -152,8 +152,8 @@ mod tests {
         match result {
             Err(err)=>{
                 assert_eq!(format!("{}", err.root_cause()), "demo error");
-                assert_eq!(format!("{}", err), "500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->first"); // NOTE: do not use display, use debug instead
-                assert_eq!(format!("{:?}", err), "500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->first\n\nCaused by:\n    demo error");
+                assert_eq!(format!("{}", err), "500::1:Unknown error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->500::1:Unknown error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->first"); // NOTE: do not use display, use debug instead
+                assert_eq!(format!("{:?}", err), "500::1:Unknown error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->500::1:Unknown error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->first\n\nCaused by:\n    demo error");
             },
             _ => {},
         }
@@ -166,7 +166,7 @@ mod tests {
             Err(err)=>{
                 assert_eq!(format!("{}", err.root_cause()), "demo error");
                 assert_eq!(format!("{}", err), "post"); // NOTE: do not use display, use debug instead
-                assert_eq!(format!("{:?}", err), "post\n\nCaused by:\n    0: 500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->pre\n    1: demo error");
+                assert_eq!(format!("{:?}", err), "post\n\nCaused by:\n    0: 500::1:Unknown error.:reskit_apierrors::errorspace::tests::test_adapt::{{closure}}->pre\n    1: demo error");
             },
             _ => {},
         }
@@ -183,8 +183,8 @@ mod tests {
         match result {
             Err(err)=>{
                 assert_eq!(format!("{}", err.root_cause()), "demo error");
-                assert_eq!(format!("{}", err), "500::2:Failure.:reskit_apierrors::errorspace::tests::test_force::{{closure}}->second"); // NOTE: do not use display, use debug instead
-                assert_eq!(format!("{:?}", err), "500::2:Failure.:reskit_apierrors::errorspace::tests::test_force::{{closure}}->second\n\nCaused by:\n    0: 500::1:Unexpected error.:reskit_apierrors::errorspace::tests::test_force::{{closure}}->first\n    1: demo error");
+                assert_eq!(format!("{}", err), "500::2:Internal server error.:reskit_apierrors::errorspace::tests::test_force::{{closure}}->second"); // NOTE: do not use display, use debug instead
+                assert_eq!(format!("{:?}", err), "500::2:Internal server error.:reskit_apierrors::errorspace::tests::test_force::{{closure}}->second\n\nCaused by:\n    0: 500::1:Unknown error.:reskit_apierrors::errorspace::tests::test_force::{{closure}}->first\n    1: demo error");
             },
             _ => {},
         }

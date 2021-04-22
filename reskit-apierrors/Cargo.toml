@@ -8,7 +8,7 @@ edition = "2018"
 
 [features]
 default = ["verbose", "serde"]
-pvlost = []
+pvlost = ["reskit-apierrors-derive/pvlost"]
 verbose = []
 serde = ["serde_qs", "serde_crate", "serde_json", "serde_urlencoded", "url/serde"]
 
@@ -30,8 +30,11 @@ serde_urlencoded = { version = "0.7.0", optional = true}
 serde_qs = { version = "0.7.0", optional = true }
 
 # local dependencies temporarily
-reskit-apierrors-derive = { path = "../reskit-apierrors-derive" }
 reskit-utils = { path = "../reskit-utils" }
+reskit-apierrors-derive = { path = "../reskit-apierrors-derive" }
+
+[dev-dependencies]
+trybuild = "1.0"
 
 [build-dependencies]
 shadow-rs = "0.5"

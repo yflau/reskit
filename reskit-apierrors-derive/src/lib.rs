@@ -23,7 +23,8 @@ use syn::{parse_macro_input, DeriveInput};
 #[proc_macro_derive(AsAPIErrorMeta, attributes(apierrormeta))]
 pub fn derive_apierrormeta(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
-    expand::derive(&input)
+    let tokens = expand::derive(&input)
         .unwrap_or_else(|err| err.to_compile_error())
-        .into()
+        .into();
+    tokens
 }

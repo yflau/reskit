@@ -2,6 +2,7 @@ use std::fmt::{self, Debug, Display};
 use std::convert::TryFrom;
 
 /// PV Lost code, describe the pv status and use code to identify the lost reason.
+#[allow(unused_qualifications)]
 #[repr(u8)]
 #[derive(Copy, Clone, Eq, PartialEq, Hash)]
 pub enum PVLost {

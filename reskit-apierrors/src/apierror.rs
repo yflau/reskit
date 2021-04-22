@@ -2,7 +2,6 @@ use std::fmt::{Display, Result, Formatter, Debug};
 use std::error::Error;
 
 use http_types::StatusCode;
-use strum::IntoEnumIterator;
 
 #[cfg(feature = "pvlost")]
 use crate::PVLost;
@@ -20,8 +19,6 @@ pub trait APIErrorMeta: Sync + Send + Debug + Display {
 pub trait APIErrorMetas {
     fn api_error_metas() -> Vec<&'static dyn APIErrorMeta>;
 }
-
-pub trait APIErrorMetaEnum: IntoEnumIterator + APIErrorMeta{} // FIXME: do we need this?
 
 #[derive(Debug)]
 pub struct APIError<'a> {

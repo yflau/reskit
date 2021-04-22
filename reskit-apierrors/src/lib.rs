@@ -3,16 +3,19 @@ extern crate shadow_rs;
 
 shadow!(build);
 
+pub mod status_code;
 pub mod apierror;
 pub mod globals;
 pub mod errorspace;
 pub mod builtin;
 pub mod macros;
+pub mod prelude;
 
 #[cfg(feature = "pvlost")]
 pub mod pvlost;
 
-pub use apierror::{APIErrorMeta, APIErrorMetas, APIError, APIErrorMetaEnum};
+#[allow(unused_qualifications)]
+pub use apierror::{APIErrorMeta, APIErrorMetas, APIError};
 pub use errorspace::Errorspace;
 pub use builtin::Builtin;
 pub use globals::{

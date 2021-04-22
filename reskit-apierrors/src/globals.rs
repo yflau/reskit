@@ -123,8 +123,8 @@ mod tests {
         assert_eq!(err.status_code(), StatusCode::InternalServerError);
         assert_eq!(err.code(), "2");
         assert_eq!(err.system(), "");
-        assert_eq!(err.message(), "Failure.");
-        assert_eq!(get_api_error_meta("", "1").unwrap().message(), "Unexpected error.");
+        assert_eq!(err.message(), "Internal server error.");
+        assert_eq!(get_api_error_meta("", "1").unwrap().message(), "Unknown error.");
         assert!(matches!(get_api_error_meta("", "1").unwrap().status_code(), StatusCode::InternalServerError)); 
     }
 
@@ -136,6 +136,6 @@ mod tests {
         assert_eq!(err.status_code(), StatusCode::InternalServerError);
         assert_eq!(err.code(), "2");
         assert_eq!(err.system(), "");
-        assert_eq!(err.message(), "Failure.");
+        assert_eq!(err.message(), "Internal server error.");
     }
 }
