@@ -7,7 +7,6 @@
 - customize Debug & Display
 - fn result optimization
 - test harness with setup & teardown
-- derive macro
 - mapping
 - document
 - add extension support
