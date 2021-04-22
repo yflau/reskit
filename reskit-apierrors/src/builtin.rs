@@ -35,7 +35,21 @@ pub enum Builtin {
     #[apierrormeta(system="", code="1", message="Unknown error.", status_code=500)]
     Unknown,
 
+    /**
+    Internal 未知的服务端错误，通常是服务端bug
 
+    Mapping:
+    - google api style guide: `google.rpc.Code.INTERNAL`
+    - http status code: 500 Internal Server Error
+
+    Internal 服务内部错误。通常是服务端bug.
+    `google.rpc.Code.INTERNAL`
+    Internal errors.  This means that some invariants expected by the
+    underlying system have been broken.  This error code is reserved
+    for serious errors.
+    */
+    #[apierrormeta(system="", code="2", message="Internal server error.", status_code=500)]
+    Internal,
 
     /**
     InvalidArgument 未知的服务端错误，通常是服务端bug
@@ -51,8 +65,8 @@ pub enum Builtin {
     that are problematic regardless of the state of the system
     (e.g., a malformed file name).
     */
-    //#[apierrormeta(system="", code="3", message="Invalid argument.", status_code=400)]
-    //InvalidArgument,
+    #[apierrormeta(system="", code="3", message="Invalid argument.", status_code=400)]
+    InvalidArgument,
 
     /**
     Unauthorized 由于缺少，无效或过期的OAuth令牌，请求未通过身份验证
@@ -64,8 +78,8 @@ pub enum Builtin {
     The request does not have valid authentication credentials for the
     operation.
     */
-    //#[apierrormeta(system="", code="4", message="Authentication failed.", status_code=401)]
-    //Unauthorized,
+    #[apierrormeta(system="", code="4", message="Authentication failed.", status_code=401)]
+    Unauthorized,
 
     /**
     NotImplemented API方法未被服务端实现
@@ -77,8 +91,8 @@ pub enum Builtin {
     The operation is not implemented or is not supported/enabled in this
     service.
     */
-    //#[apierrormeta(system="", code="6", message="Not Implemented.", status_code=501)]
-    //NotImplemented,
+    #[apierrormeta(system="", code="6", message="Not Implemented.", status_code=501)]
+    NotImplemented,
 
     /**
     NotFound 没有找到指定的资源，或者请求被未公开的原因（例如白名单）拒绝
@@ -93,8 +107,8 @@ pub enum Builtin {
     a class of users, such as user-based access control, `PERMISSION_DENIED`
     must be used.
     */
-    //#[apierrormeta(system="", code="7", message="Not found.", status_code=404)]
-    //NotFound,
+    #[apierrormeta(system="", code="7", message="Not found.", status_code=404)]
+    NotFound,
 
     /**
     PermissionDenied 客户端没有足够的权限。 发生这种情况的原因可能是OAuth令牌没有正确的作用域，客户端没有权限，或者API尚未为客户端项目启用。
@@ -112,8 +126,8 @@ pub enum Builtin {
     request is valid or the requested entity exists or satisfies
     other pre-conditions.
     */
-    //#[apierrormeta(system="", code="13", message="Permission Denied.", status_code=403)]
-    //PermissionDenied,
+    #[apierrormeta(system="", code="13", message="Permission Denied.", status_code=403)]
+    PermissionDenied,
 
 
     /**
@@ -135,8 +149,8 @@ pub enum Builtin {
     Some resource has been exhausted, perhaps a per-user quota, or
     perhaps the entire file system is out of space.
     */
-    //#[apierrormeta(system="", code="16", message="Data source request failure.", status_code=429)]
-    //ResourceExhausted,
+    #[apierrormeta(system="", code="16", message="Data source request failure.", status_code=429)]
+    ResourceExhausted,
 
     /**
     FailedPrecondition 请求无法在当前系统状态下执行，例如删除非空目录。
@@ -162,8 +176,8 @@ pub enum Builtin {
          should be returned since the client should not retry unless
          the files are deleted from the directory.
     */
-    //#[apierrormeta(system="", code="20", message="Failed precondition, do not retry.", status_code=400)]
-    //FailedPrecondition,
+    #[apierrormeta(system="", code="20", message="Failed precondition, do not retry.", status_code=400)]
+    FailedPrecondition,
 
     /**
     OutOfRange 客户端指定了一个无效范围。
@@ -188,8 +202,8 @@ pub enum Builtin {
     a space can easily look for an `OUT_OF_RANGE` error to detect when
     they are done.
     */
-    //#[apierrormeta(system="", code="21", message="Out of range.", status_code=400)]
-    //OutOfRange,
+    #[apierrormeta(system="", code="21", message="Out of range.", status_code=400)]
+    OutOfRange,
 
     /**
     AlreadyExists 客户试图创建一个已存在的资源。
@@ -201,8 +215,8 @@ pub enum Builtin {
     The entity that a client attempted to create (e.g., file or directory)
     already exists.
     */
-    //#[apierrormeta(system="", code="22", message="Already exists.", status_code=409)]
-    //AlreadyExists,
+    #[apierrormeta(system="", code="22", message="Already exists.", status_code=409)]
+    AlreadyExists,
 
     /**
     Aborted 并发冲突，如读 - 修改 - 写冲突。
@@ -217,8 +231,8 @@ pub enum Builtin {
     See the guidelines above for deciding between `FAILED_PRECONDITION`,
     `ABORTED`, and `UNAVAILABLE`.
     */
-    //#[apierrormeta(system="", code="23", message="Aborted, retry whole transaction.", status_code=409)]
-    //Aborted,
+    #[apierrormeta(system="", code="23", message="Aborted, retry whole transaction.", status_code=409)]
+    Aborted,
 
     /**
     Cancelled 请求被客户端取消
@@ -229,8 +243,8 @@ pub enum Builtin {
 
     The operation was cancelled, typically by the caller.
     */
-    //#[apierrormeta(system="", code="24", message="Request cancelled by client.", status_code=400)] // FIXME: 499
-    //Cancelled,
+    #[apierrormeta(system="", code="24", message="Request cancelled by client.", status_code=400)] // FIXME: 499
+    Cancelled,
 
     /**
     DeadlineExceeded 请求超时。
@@ -245,8 +259,8 @@ pub enum Builtin {
     successful response from a server could have been delayed long
     enough for the deadline to expire.
     */
-    //#[apierrormeta(system="", code="25", message="Timeout.", status_code=504, pvlost=1)]
-    //DeadlineExceeded,
+    #[apierrormeta(system="", code="25", message="Timeout.", status_code=504, pvlost=1)]
+    DeadlineExceeded,
 
     /**
     Unavailable 服务不可用。通常是服务端宕机。通常由网关返回
@@ -263,8 +277,8 @@ pub enum Builtin {
     See the guidelines above for deciding between `FAILED_PRECONDITION`,
     `ABORTED`, and `UNAVAILABLE`.
     */
-    //#[apierrormeta(system="", code="26", message="Service unavailable.", status_code=503, pvlost=1)]
-    //Unavailable,
+    #[apierrormeta(system="", code="26", message="Service unavailable.", status_code=503, pvlost=1)]
+    Unavailable,
 
     /**
     DataLoss 不可恢复的数据丢失或数据损坏。 客户端应该向用户报告错误。
@@ -275,24 +289,8 @@ pub enum Builtin {
 
     Unrecoverable data loss or corruption.
     */
-    //#[apierrormeta(system="", code="27", message="Data loss.", status_code=503)]
-    //DataLoss,
-
-    /**
-    Internal 未知的服务端错误，通常是服务端bug
-
-    Mapping:
-    - google api style guide: `google.rpc.Code.INTERNAL`
-    - http status code: 500 Internal Server Error
-
-    Internal 服务内部错误。通常是服务端bug.
-    `google.rpc.Code.INTERNAL`
-    Internal errors.  This means that some invariants expected by the
-    underlying system have been broken.  This error code is reserved
-    for serious errors.
-    */
-    #[apierrormeta(system="", code="2", message="Internal server error.", status_code=500)]
-    Internal,
+    #[apierrormeta(system="", code="27", message="Data loss.", status_code=503)]
+    DataLoss,
 }
 
 // impl APIErrorMeta for Builtin { // FIXME: derive
